@@ -6,14 +6,11 @@
 */
 
 
-// creates a Control and returns a pointer to it
-Controls *create_control(short left, short right, short up, short down)
+// sets keys of given control
+void set_control(Controls *control, short left, short right, short up, short down)
 {
-    Control *control = malloc(sizeof(Control));
     control->left = left;
-    control->left = right;
-    control->left = up;
-    control->left = down;
-    return control;
+    control->right = right;
+    control->up = up;
+    control->down = down;
 }
-

@@ -30,7 +30,7 @@ struct controls {
 };
 typedef struct controls Controls;
 
-// creates a Control and returns a pointer to it
-Controls *create_control(short left, short right, short up, short down);
+// sets keys of given control
+void set_control(Controls *control, short left, short right, short up, short down);
 
 #endif
