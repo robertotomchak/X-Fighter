@@ -4,6 +4,8 @@
 /* Defines the Player of the games */
 #include <stdbool.h>
 
+#include <allegro5/allegro5.h>
+
 #include "auxiliary.h"
 
 #define STANDING 0
@@ -29,11 +31,13 @@ struct player {
     short stamina;
     short stamina_speed;
     short status;  // STANDING, AIR, ...
+    bool face_right;
+    ALLEGRO_COLOR color;
 };
 typedef struct player Player;
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, short stamina_speed);
+Player *create_player(short up, short left, short down, short right, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, short stamina_speed, bool face_right, ALLEGRO_COLOR color);
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
@@ -41,6 +45,9 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 
 // draws player
 void draw_player(Player *p);
+
+// kills player (probably not in a painfull way) by freeing its memory
+void kill_player(Player *p);
 
 #endif
 

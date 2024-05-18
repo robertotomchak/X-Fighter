@@ -1,6 +1,8 @@
 /* Defines multiple auxiliary functions, which many of the libraries will use
 */
 
+#include "auxiliary.h"
+
 
 // sets values of given pair
 void set_pair(Pair *pair, long x, long y)

@@ -7,7 +7,7 @@
 struct pair {
     long x;
     long y;
-}
+};
 typedef struct pair Pair;
 
 // sets values of given pair
