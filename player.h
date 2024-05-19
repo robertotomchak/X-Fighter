@@ -12,12 +12,17 @@
 #define CROUCH 1
 #define AIR 2
 
-// collections of keys
+struct key {
+    short keycode;
+    unsigned char active;
+};
+typedef struct key Key;
+
 struct joystick {
-    short up;
-    short left;
-    short down;
-    short right;
+    Key up;
+    Key left;
+    Key down;
+    Key right;
 };
 typedef struct joystick Joystick;
 
@@ -28,8 +33,6 @@ struct player {
     Pair speed;
     short jump_speed;
     short health;
-    short stamina;
-    short stamina_speed;
     short status;  // STANDING, AIR, ...
     bool face_right;
     ALLEGRO_COLOR color;
@@ -37,7 +40,7 @@ struct player {
 typedef struct player Player;
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, short stamina_speed, bool face_right, ALLEGRO_COLOR color);
+Player *create_player(short up, short left, short down, short right, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, bool face_right, ALLEGRO_COLOR color);
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
