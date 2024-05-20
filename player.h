@@ -44,7 +44,8 @@ Player *create_player(short up, short left, short down, short right, short x, sh
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
-void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity);
+// deals with collision with p_other
+void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other);
 
 // draws player
 void draw_player(Player *p);

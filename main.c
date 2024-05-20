@@ -52,8 +52,8 @@ int main ()
         }
         else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
-        update_player(p1, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY);
-        update_player(p2, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY);
+        update_player(p1, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY, p2);
+        update_player(p2, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY, p1);
     }
     al_destroy_display(disp);
     al_destroy_timer(timer);

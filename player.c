@@ -59,9 +59,16 @@ void move_player_y(Player *p, short min_y, short max_y, short gravity)
     p->speed.y += gravity;
 }
 
+// returns true if the players collide vertically
+bool collision_y(Player *p1, Player *p2)
+{
+    return (p1->coords.y >= p2->coords.y && p1->coords.y <= p2->coords.y + p2->size.y) || (p2->coords.y >= p1->coords.y && p2->coords.y <= p1->coords.y + p1->size.y);
+}
+
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
-void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity)
+// deals with collision with p_other
+void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other)
 {
     // if key pressed or release, update joystick
     if (event == ALLEGRO_EVENT_KEY_DOWN || event == ALLEGRO_EVENT_KEY_UP) {
@@ -81,10 +88,19 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     if (event != ALLEGRO_EVENT_TIMER)
         return;
 
-    if (p->joystick.left.active)
+    if (p->joystick.left.active) {
+        // other player at left
+        if (p_other->coords.x + p_other->size.x <= p->coords.x && collision_y(p, p_other))
+            min_screen.x = p_other->coords.x + p_other->size.x;
         p->coords.x = max(min_screen.x, p->coords.x - p->speed.x);
-    if (p->joystick.right.active)
+
+    }
+    if (p->joystick.right.active) {
+        // other player at right
+        if (p->coords.x + p->size.x <= p_other->coords.x && collision_y(p, p_other))
+            max_screen.x = p_other->coords.x;
         p->coords.x = min(max_screen.x - p->size.x, p->coords.x + p->speed.x);
+    }
     if (p->joystick.up.active) {
         p->status = AIR;
         p->speed.y = -p->jump_speed;
