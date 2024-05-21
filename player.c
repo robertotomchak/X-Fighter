@@ -53,16 +53,22 @@ Player *create_player(short up, short left, short down, short right, short x, sh
 void move_player_y(Player *p, short min_y, short max_y, short gravity)
 {
     if (p->speed.y > 0)
-        p->coords.y = min(max_y, p->coords.y + p->speed.y);
+        p->coords.y = min(max_y - p->size.y, p->coords.y + p->speed.y);
     else
         p->coords.y = max(min_y, p->coords.y + p->speed.y);
     p->speed.y += gravity;
 }
 
+// returns true if the players collide horizontally
+bool collision_x(Player *p1, Player *p2)
+{
+    return (p1->coords.x >= p2->coords.x && p1->coords.x < p2->coords.x + p2->size.x) || (p2->coords.x >= p1->coords.x && p2->coords.x < p1->coords.x + p1->size.x);
+}
+
 // returns true if the players collide vertically
 bool collision_y(Player *p1, Player *p2)
 {
-    return (p1->coords.y >= p2->coords.y && p1->coords.y <= p2->coords.y + p2->size.y) || (p2->coords.y >= p1->coords.y && p2->coords.y <= p1->coords.y + p1->size.y);
+    return (p1->coords.y >= p2->coords.y && p1->coords.y < p2->coords.y + p2->size.y) || (p2->coords.y >= p1->coords.y && p2->coords.y < p1->coords.y + p1->size.y);
 }
 
 // updates player based on event type and key 
@@ -106,13 +112,23 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         p->speed.y = -p->jump_speed;
         p->joystick.up.active = 0;
     }
-    // vertical movement
-    if (p->status == AIR) {
+    // vertical movement (only if player is on the air and not on the top of the other)
+    if (p->status == AIR && !(collision_x(p, p_other) && p->coords.y + p->size.y == p_other->coords.y)) {
         move_player_y(p, min_screen.y, max_screen.y, gravity);
         if (p->coords.y + p->size.y >= max_screen.y)
             p->status = p->joystick.down.active? CROUCH: STANDING;
+        // collision with other player
+        else if (collision_x(p, p_other) && collision_y(p, p_other)) {
+            // other player is above
+            if (p->speed.y < 0)
+                p->coords.y = p_other->coords.y + p_other->size.y;
+            // other player is below
+            else
+                p->coords.y = p_other->coords.y - p->size.y;
+            p->speed.y = 0;               
+        }
     }
-    else {
+    else if (p->status != AIR) {
         if (p->joystick.down.active)
             p->status = CROUCH;
         else
