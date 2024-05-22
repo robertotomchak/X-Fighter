@@ -60,7 +60,15 @@ bool collision_x(Player *p1, Player *p2)
 // returns true if the players collide vertically
 bool collision_y(Player *p1, Player *p2)
 {
-    return (p1->coords.y <= p2->coords.y && p1->coords.y > p2->coords.y - p2->size.y) || (p2->coords.y <= p1->coords.y && p2->coords.y > p1->coords.y - p1->size.y);
+    long h1, h2;
+    h1 = p1->size.y;
+    h2 = p2->size.y;
+    if (p1->status == CROUCH)
+        h1 /=  2;
+    if (p2->status == CROUCH)
+        h2 /= 2;
+
+    return (p1->coords.y <= p2->coords.y && p1->coords.y > p2->coords.y - h2) || (p2->coords.y <= p1->coords.y && p2->coords.y > p1->coords.y - h1);
 }
 
 // updates player based on event type and key 
@@ -68,6 +76,13 @@ bool collision_y(Player *p1, Player *p2)
 // deals with collision with p_other
 void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other)
 {
+    long h, h_other;
+    h = p->size.y;
+    h_other = p_other->size.y;
+    if (p->status == CROUCH)
+        h /= 2;
+    if (p_other->status == CROUCH)
+        h_other /= 2;
     // if key pressed or release, update joystick
     if (event == ALLEGRO_EVENT_KEY_DOWN || event == ALLEGRO_EVENT_KEY_UP) {
         if (key == p->joystick.left.keycode)
@@ -105,7 +120,7 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         p->joystick.up.active = 0;
     }
     // vertical movement (only if player is on the air and not on the top of the other)
-    if (p->status == AIR && !(collision_x(p, p_other) && p->coords.y == p_other->coords.y - p_other->size.y)) {
+    if (p->status == AIR && !(collision_x(p, p_other) && p->coords.y == p_other->coords.y - h_other)) {
         move_player_y(p, min_screen.y, max_screen.y, gravity);
         if (p->coords.y >= max_screen.y)
             p->status = p->joystick.down.active? CROUCH: STANDING;
@@ -113,10 +128,10 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         else if (collision_x(p, p_other) && collision_y(p, p_other)) {
             // other player is above
             if (p->speed.y < 0)
-                p->coords.y = p_other->coords.y + p->size.y;
+                p->coords.y = p_other->coords.y + h;
             // other player is below
             else
-                p->coords.y = p_other->coords.y - p->size.y;
+                p->coords.y = p_other->coords.y - h_other;
             p->speed.y = 0;               
         }
     }
