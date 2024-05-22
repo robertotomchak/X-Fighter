@@ -1,13 +1,7 @@
 // Compilação: gcc auxiliary.c player.c main.c -o main $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_primitives-5 --libs --cflags)
 
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_primitives.h>
-
-#include <stdio.h>
-#include <stdbool.h>
 
 #include "player.h"
-#include "auxiliary.h"
 
 #define FPS 30
 #define SCREEN_WIDTH 700
@@ -36,8 +30,8 @@ int main ()
     ALLEGRO_EVENT event;
     al_start_timer(timer);
 
-    Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, 50, SCREEN_HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(255, 0, 0));
-    Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, SCREEN_WIDTH - 50, SCREEN_HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(0, 255, 0)); 
+    Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(255, 0, 0));
+    Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, SCREEN_WIDTH - 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(0, 255, 0)); 
     Pair min_screen, max_screen;
     set_pair(&min_screen, 0, 0);
     set_pair(&max_screen, SCREEN_WIDTH, SCREEN_HEIGHT);

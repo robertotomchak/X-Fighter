@@ -3,8 +3,11 @@
 
 /* Defines the Player of the games */
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <allegro5/allegro5.h>
+#include <allegro5/allegro_primitives.h>
 
 #include "auxiliary.h"
 
@@ -28,7 +31,7 @@ typedef struct joystick Joystick;
 
 struct player {
     Joystick joystick;
-    Pair coords;
+    Pair coords;  // coordinates of bottom-left corner
     Pair size;
     Pair speed;
     short jump_speed;
