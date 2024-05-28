@@ -1,13 +1,21 @@
 /* Defines the Player of the games */
 #include "player.h"
 
-#define STANDING 0
-#define CROUCH 1
-#define AIR 2
-
+// creates a hit object
+Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage)
+{
+    Hit *h = malloc(sizeof(Hit));
+    if (!h)
+        return NULL;
+    h->size.x = size_x;
+    h->size.y = size_y;
+    h->offset = offset;
+    h->damage = damage;
+    return h;
+}
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, bool face_right, ALLEGRO_COLOR color)
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color)
 {
     Player *p = malloc(sizeof(Player));
     if (!p)
@@ -16,11 +24,15 @@ Player *create_player(short up, short left, short down, short right, short x, sh
     p->joystick.left.keycode = left;
     p->joystick.down.keycode = down;
     p->joystick.right.keycode = right;
-    // starts with no keys presed
+    p->joystick.hit_sup.keycode = k_hit_sup;
+    p->joystick.hit_inf.keycode = k_hit_inf;
+    // starts with no keys pressed
     p->joystick.up.active = 0;
     p->joystick.left.active = 0;
     p->joystick.down.active = 0;
     p->joystick.right.active = 0;
+    p->joystick.hit_sup.active = 0;
+    p->joystick.hit_inf.active = 0;
 
     p->coords.x = x;
     p->coords.y = y;
@@ -32,14 +44,22 @@ Player *create_player(short up, short left, short down, short right, short x, sh
     p->jump_speed = jump_speed;
     p->status = STANDING;
 
-    p->health = 100; // starts at full health
+    p->health = MAX_HEALTH; // starts at full health
+    p->hit_sup = hit_sup;
+    p->hit_inf = hit_inf;
+    p->hit_status = NO_HIT;
 
-    p->face_right = p->face_right;
+    p->face_right = true;  // by default, look right
+    // update hits coordinates
+    p->hit_sup->coords.x = p->coords.x + p->size.x;
+    p->hit_sup->coords.y = p->coords.y - p->size.y * p->hit_sup->offset / 100;
+    p->hit_inf->coords.x = p->coords.x + p->size.x;
+    p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
+
     p->color = color;
 
     return p;
 }
-
 
 // moves player vertically and updates its speed
 void move_player_y(Player *p, short min_y, short max_y, short gravity)
@@ -60,7 +80,7 @@ bool collision_x(Player *p1, Player *p2)
 // returns true if the players collide vertically
 bool collision_y(Player *p1, Player *p2)
 {
-    long h1, h2;
+    int h1, h2;
     h1 = p1->size.y;
     h2 = p2->size.y;
     if (p1->status == CROUCH)
@@ -71,12 +91,38 @@ bool collision_y(Player *p1, Player *p2)
     return (p1->coords.y <= p2->coords.y && p1->coords.y > p2->coords.y - h2) || (p2->coords.y <= p1->coords.y && p2->coords.y > p1->coords.y - h1);
 }
 
+// checks if player has been hit
+// orientation is true if player that hits is looking to right; false otherwise
+bool player_hit(Player *p, Hit *hit, bool orientation) {
+    int x1, x2, y1, y2, h;
+    bool col_y, col_x;  // collisions
+
+    h = p->size.y;
+    if (p->status == CROUCH)
+        h /=  2;
+
+    if (orientation) {
+        x1 = hit->coords.x;
+        x2 = hit->coords.x + hit->size.x;
+    }
+    else {
+        x1 = hit->coords.x - hit->size.x;
+        x2 = hit->coords.x;
+    }
+    y1 = hit->coords.y;
+    y2 = hit->coords.y - hit->size.y;
+
+    col_y = (y1 > p->coords.y - h && y1 < p->coords.y) || (y2 > p->coords.y - h && y2 < p->coords.y);
+    col_x = (x1 > p->coords.x && x1 < p->coords.x + p->size.x) || (x2 > p->coords.x && x2 < p->coords.x + p->size.x) || (x1 < p->coords.x && x2 >= p->coords.x + p->size.x);
+    return col_x && col_y;
+}
+
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
 // deals with collision with p_other
 void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other)
 {
-    long h, h_other;
+    int h, h_other;
     h = p->size.y;
     h_other = p_other->size.y;
     if (p->status == CROUCH)
@@ -93,7 +139,19 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->joystick.up.active = 1;
         else if (key == p->joystick.down.keycode)
             p->joystick.down.active ^= 1;
-            
+        else if (key == p->joystick.hit_sup.keycode) {
+            p->joystick.hit_sup.active ^= 1;
+            if (p->hit_status != INF_HIT)
+                p->hit_status = p->joystick.hit_sup.active? SUP_HIT: NO_HIT;
+        }
+        else if (key == p->joystick.hit_inf.keycode) {
+            p->joystick.hit_inf.active ^= 1;
+            if (p->hit_status != SUP_HIT)
+                p->hit_status = p->joystick.hit_inf.active? INF_HIT: NO_HIT;
+        }
+        // players can only hit if standing
+        if (p->status != STANDING)
+            p->hit_status = NO_HIT;
         return;
     }
 
@@ -106,7 +164,6 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         if (p_other->coords.x + p_other->size.x <= p->coords.x && collision_y(p, p_other))
             min_screen.x = p_other->coords.x + p_other->size.x;
         p->coords.x = max(min_screen.x, p->coords.x - p->speed.x);
-
     }
     if (p->joystick.right.active) {
         // other player at right
@@ -141,22 +198,57 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         else
             p->status = STANDING;
     }
+
+    // update health (if takes damage)
+    if (p_other->hit_status == SUP_HIT && player_hit(p, p_other->hit_sup, p_other->face_right))
+        p->health = max(0, p->health - p_other->hit_sup->damage);
+    else if (p_other->hit_status == INF_HIT && player_hit(p, p_other->hit_inf, p_other->face_right))
+        p->health = max(0, p->health - p_other->hit_inf->damage);
+    
+    // update facing side
+    if (p->coords.x < p_other->coords.x != p->face_right)
+        p->face_right = p->coords.x < p_other->coords.x;
+
+    // update hits coordinates
+    if (p->face_right) {
+        p->hit_sup->coords.x = p->coords.x + p->size.x;
+        p->hit_sup->coords.y = p->coords.y - p->size.y * p->hit_sup->offset / 100;
+        p->hit_inf->coords.x = p->coords.x + p->size.x;
+        p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
+    }
+    else {
+        p->hit_sup->coords.x = p->coords.x;
+        p->hit_sup->coords.y = p->coords.y - p->size.y * p->hit_sup->offset / 100;
+        p->hit_inf->coords.x = p->coords.x;
+        p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
+    }
 }
 
 // draws player
 void draw_player(Player *p)
 {
+    int end_hit_x;
     if (p->status == CROUCH)
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, p->color);
     else
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, p->color);
+    
+    if (p->hit_status == SUP_HIT) {
+        end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
+        al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, p->color);
+    }
+    else if (p->hit_status == INF_HIT) {
+        end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
+        al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, p->color);
+    }
 }
 
 // kills player (probably not in a painfull way) by freeing its memory
 void kill_player(Player *p)
 {
-    free(p);
-    p = NULL;
+    free(p->hit_inf); p->hit_inf = NULL;
+    free(p->hit_sup); p->hit_sup = NULL;
+    free(p); p = NULL;
 }
 
 

@@ -5,7 +5,7 @@
 
 
 // sets values of given pair
-void set_pair(Pair *pair, long x, long y)
+void set_pair(Pair *pair, int x, int y)
 {
     pair->x = x;
     pair->y = y;
@@ -13,14 +13,14 @@ void set_pair(Pair *pair, long x, long y)
 
 
 // returns the maximum between two numbers
-long max(long a, long b)
+int max(int a, int b)
 {
     return a > b? a: b;
 }
 
 
 // returns the minimum between two numbers
-long min(long a, long b)
+int min(int a, int b)
 {
     return a < b? a: b;
 }

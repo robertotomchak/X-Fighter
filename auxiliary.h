@@ -5,20 +5,20 @@
 */
 
 struct pair {
-    long x;
-    long y;
+    int x;
+    int y;
 };
 typedef struct pair Pair;
 
 // sets values of given pair
-void set_pair(Pair *pair, long x, long y);
+void set_pair(Pair *pair, int x, int y);
 
 
 // returns the maximum between two numbers
-long max(long a, long b);
+int max(int a, int b);
 
 
 // returns the minimum between two numbers
-long min(long a, long b);
+int min(int a, int b);
 
 #endif

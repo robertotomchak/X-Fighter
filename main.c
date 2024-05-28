@@ -13,6 +13,16 @@
 #define SPEED_X 10
 #define JUMP_SPEED 30
 
+#define OFFSET_SUP 70
+#define SIZE_X_SUP 40
+#define SIZE_Y_SUP 10
+#define DMG_SUP 10
+
+#define OFFSET_INF 0
+#define SIZE_X_INF 20
+#define SIZE_Y_INF 5
+#define DMG_INF 5
+
 int main ()
 {
     al_init();
@@ -30,13 +40,29 @@ int main ()
     ALLEGRO_EVENT event;
     al_start_timer(timer);
 
-    Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(255, 0, 0));
-    Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, SCREEN_WIDTH - 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 0, al_map_rgb(0, 255, 0)); 
+    Hit *h_sup1 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
+    Hit *h_inf1 = create_hit(SIZE_X_INF, SIZE_Y_INF, OFFSET_INF, DMG_INF);
+    Hit *h_sup2 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
+    Hit *h_inf2 = create_hit(SIZE_X_INF, SIZE_Y_INF, OFFSET_INF, DMG_INF);
+
+    Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_E, ALLEGRO_KEY_R,
+                        50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
+                        h_sup1, h_inf1, al_map_rgb(255, 0, 0));
+    Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
+                        SCREEN_WIDTH - 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
+                        h_sup2, h_inf2, al_map_rgb(0, 255, 0)); 
     Pair min_screen, max_screen;
     set_pair(&min_screen, 0, 0);
     set_pair(&max_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    short health1 = p1->health, health2 = p2->health;
+    printf("%d %d\n", health1, health2);
     while (true) {
+        if (health1 != p1->health || health2 != p2->health) {
+            health1 = p1->health;
+            health2 = p2->health;
+            printf("%d %d\n", health1, health2);
+        }
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
