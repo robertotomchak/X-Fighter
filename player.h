@@ -76,6 +76,13 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 // draws player
 void draw_player(Player *p);
 
+// defines if match is over, and who won
+// return -1, 0 or 1:
+    // -1: p1 won
+    // 0: match is not over
+    // 1: p2 won
+int game_over(Player *p1, Player *p2);
+
 // kills player (probably not in a painfull way) by freeing its memory
 void kill_player(Player *p);
 

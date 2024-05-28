@@ -113,7 +113,7 @@ bool player_hit(Player *p, Hit *hit, bool orientation) {
     y2 = hit->coords.y - hit->size.y;
 
     col_y = (y1 > p->coords.y - h && y1 < p->coords.y) || (y2 > p->coords.y - h && y2 < p->coords.y);
-    col_x = (x1 > p->coords.x && x1 < p->coords.x + p->size.x) || (x2 > p->coords.x && x2 < p->coords.x + p->size.x) || (x1 < p->coords.x && x2 >= p->coords.x + p->size.x);
+    col_x = (x1 > p->coords.x && x1 < p->coords.x + p->size.x) || (x2 > p->coords.x && x2 < p->coords.x + p->size.x) || (x1 <= p->coords.x && x2 >= p->coords.x + p->size.x);
     return col_x && col_y;
 }
 
@@ -241,6 +241,16 @@ void draw_player(Player *p)
         end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
         al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, p->color);
     }
+}
+
+// defines if match is over, and who won
+// return -1, 0 or 1:
+    // -1: p1 won
+    // 0: match is not over
+    // 1: p2 won
+int game_over(Player *p1, Player *p2)
+{
+    return (p1->health > 0) - (p2->health > 0);
 }
 
 // kills player (probably not in a painfull way) by freeing its memory

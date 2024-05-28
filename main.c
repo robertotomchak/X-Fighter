@@ -57,7 +57,7 @@ int main ()
 
     short health1 = p1->health, health2 = p2->health;
     printf("%d %d\n", health1, health2);
-    while (true) {
+    while (!game_over(p1, p2)) {
         if (health1 != p1->health || health2 != p2->health) {
             health1 = p1->health;
             health2 = p2->health;
