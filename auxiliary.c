@@ -11,6 +11,11 @@ void set_pair(Pair *pair, int x, int y)
     pair->y = y;
 }
 
+// returns the absolute value of x
+int abs(int x)
+{
+    return x > 0? x: -x;
+}
 
 // returns the maximum between two numbers
 int max(int a, int b)

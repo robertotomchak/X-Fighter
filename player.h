@@ -66,7 +66,7 @@ typedef struct player Player;
 Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage);
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color);
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color);
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
@@ -81,7 +81,11 @@ void draw_player(Player *p);
     // -1: p1 won
     // 0: match is not over
     // 1: p2 won
-int game_over(Player *p1, Player *p2);
+short round_over(Player *p1, Player *p2);
+
+// resets player to given coordinates
+// restores health
+void reset_player(Player *p, int x, int y);
 
 // kills player (probably not in a painfull way) by freeing its memory
 void kill_player(Player *p);

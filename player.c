@@ -15,7 +15,7 @@ Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage)
 }
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short x, short y, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color)
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color)
 {
     Player *p = malloc(sizeof(Player));
     if (!p)
@@ -34,8 +34,10 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->joystick.hit_sup.active = 0;
     p->joystick.hit_inf.active = 0;
 
-    p->coords.x = x;
-    p->coords.y = y;
+    // initialing position to 0
+    p->coords.x = 0;
+    p->coords.y = 0;
+
     p->size.x = size_x;
     p->size.y = size_y;
 
@@ -206,7 +208,7 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
         p->health = max(0, p->health - p_other->hit_inf->damage);
     
     // update facing side
-    if (p->coords.x < p_other->coords.x != p->face_right)
+    if ((p->coords.x < p_other->coords.x) != p->face_right)
         p->face_right = p->coords.x < p_other->coords.x;
 
     // update hits coordinates
@@ -248,9 +250,22 @@ void draw_player(Player *p)
     // -1: p1 won
     // 0: match is not over
     // 1: p2 won
-int game_over(Player *p1, Player *p2)
+short round_over(Player *p1, Player *p2)
 {
-    return (p1->health > 0) - (p2->health > 0);
+    return (p2->health > 0) - (p1->health > 0);
+}
+
+// resets player to given coordinates
+// restores health
+void reset_player(Player *p, int x, int y)
+{
+    p->coords.x = x;
+    p->coords.y = y;
+    p->health = MAX_HEALTH;
+    p->status = STANDING;
+    p->hit_status = NO_HIT;
+    p->face_right = true;
+    p->speed.y = 0;  // starts on ground
 }
 
 // kills player (probably not in a painfull way) by freeing its memory

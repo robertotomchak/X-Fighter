@@ -13,6 +13,8 @@ typedef struct pair Pair;
 // sets values of given pair
 void set_pair(Pair *pair, int x, int y);
 
+// returns the absolute value of x
+int abs(int x);
 
 // returns the maximum between two numbers
 int max(int a, int b);

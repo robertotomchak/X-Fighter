@@ -2,6 +2,10 @@
 
 
 #include "player.h"
+#include "fight_screen.h"
+
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_primitives.h>
 
 #define FPS 30
 #define SCREEN_WIDTH 700
@@ -46,18 +50,16 @@ int main ()
     Hit *h_inf2 = create_hit(SIZE_X_INF, SIZE_Y_INF, OFFSET_INF, DMG_INF);
 
     Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_E, ALLEGRO_KEY_R,
-                        50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
+                        PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup1, h_inf1, al_map_rgb(255, 0, 0));
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
-                        SCREEN_WIDTH - 50, SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
+                        PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, al_map_rgb(0, 255, 0)); 
-    Pair min_screen, max_screen;
-    set_pair(&min_screen, 0, 0);
-    set_pair(&max_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
+    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
 
-    short health1 = p1->health, health2 = p2->health;
+    short health1 = p1->health, health2 = p2->health, status = STAY;
     printf("%d %d\n", health1, health2);
-    while (!game_over(p1, p2)) {
+    while (status != QUIT && status != GAME_OVER) {
         if (health1 != p1->health || health2 != p2->health) {
             health1 = p1->health;
             health2 = p2->health;
@@ -65,21 +67,15 @@ int main ()
         }
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER) {
-            al_clear_to_color(al_map_rgb(0, 0, 0));
-            draw_player(p1);
-            draw_player(p2);
-            al_flip_display();
+            draw_fight_screen(fscreen);
         }
-        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-            break;
-        update_player(p1, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY, p2);
-        update_player(p2, min_screen, max_screen, event.type, event.keyboard.keycode, GRAVITY, p1);
+        status = update_fight_screen(fscreen, event.type, event.keyboard.keycode);
     }
+    printf("%d\n", game_over(fscreen));
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
-    kill_player(p1);
-    kill_player(p2);
+    destroy_fight_screen(fscreen);
     return 0;
 }
