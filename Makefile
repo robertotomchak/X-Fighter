@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -g $(shellpkg-config --cflags)
 LDFLAGS = $(shell pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_primitives-5 --libs)
 
-	objects = auxiliary.o player.o main.o fight_screen.o
+	objects = auxiliary.o player.o main.o fight_screen.o select_screen.o
 
 all: $(objects)
 	gcc -o main $(objects) $(CFLAGS) $(LDFLAGS)
@@ -10,16 +10,20 @@ all: $(objects)
 main.o: main.c
 	$(CC) -c $(CFLAGS) main.c
 
-auxiliary.o: auxiliary.c
+auxiliary.o: auxiliary.h auxiliary.c
 	$(CC) -c $(CFLAGS) auxiliary.c
 
-player.o: player.c
+player.o: player.h player.c
 	$(CC) -c $(CFLAGS) player.c
 
-fight_screen.o: fight_screen.c
+fight_screen.o: fight_screen.h fight_screen.c
 	$(CC) -c $(CFLAGS) fight_screen.c
 
-clean: rm -f $(objects)
+select_screen.o: select_screen.h select_screen.c
+	$(CC) -c $(CFLAGS) select_screen.c
+
+clean: 
+	rm -f $(objects)
 
 purge: clean
 	rm -f main

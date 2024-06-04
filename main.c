@@ -3,6 +3,7 @@
 
 #include "player.h"
 #include "fight_screen.h"
+#include "select_screen.h"
 
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
@@ -56,26 +57,26 @@ int main ()
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, al_map_rgb(0, 255, 0)); 
     Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
+    Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
+                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_ENTER);
 
     short health1 = p1->health, health2 = p2->health, status = STAY;
     printf("%d %d\n", health1, health2);
-    while (status != QUIT && status != GAME_OVER) {
-        if (health1 != p1->health || health2 != p2->health) {
-            health1 = p1->health;
-            health2 = p2->health;
-            printf("%d %d\n", health1, health2);
-        }
+    while (status == STAY) {
         al_wait_for_event(queue, &event);
-        if (event.type == ALLEGRO_EVENT_TIMER) {
-            draw_fight_screen(fscreen);
-        }
-        status = update_fight_screen(fscreen, event.type, event.keyboard.keycode);
+        if (event.type == ALLEGRO_EVENT_TIMER)
+            draw_select_screen(sscreen);
+        status = update_select_screen(sscreen, event.type, event.keyboard.keycode);
     }
-    printf("%d\n", game_over(fscreen));
+    Pair choices;
+    get_choices(sscreen, &choices);
+    printf("%d %d\n", choices.x, choices.y);
+
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
     destroy_fight_screen(fscreen);
+    destroy_select_screen(sscreen);
     return 0;
 }
