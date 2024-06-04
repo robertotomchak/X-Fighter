@@ -1,12 +1,12 @@
 // Compilação: gcc auxiliary.c player.c main.c -o main $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_primitives-5 --libs --cflags)
 
+#include <stdio.h>
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_primitives.h>
 
 #include "player.h"
 #include "fight_screen.h"
 #include "select_screen.h"
-
-#include <allegro5/allegro5.h>
-#include <allegro5/allegro_primitives.h>
 
 #define FPS 30
 #define SCREEN_WIDTH 700

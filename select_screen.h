@@ -8,11 +8,9 @@
 #include <allegro5/allegro_primitives.h>
 
 #include "auxiliary.h"
+#include "screen_status_defines.h"
 
 #define N_CHOICES 4
-#define STAY 0
-#define QUIT 1
-#define SELECTED 2
 
 // useful defines for drawings (all are porcentages)
 #define BIG_SQUARE 50  // related to height

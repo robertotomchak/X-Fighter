@@ -1,7 +1,6 @@
 /* screen where players select their players*/
 
 #include "select_screen.h"
-#include <stdio.h>
 
 /*
 #define N_CHOICES 4

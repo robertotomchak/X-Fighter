@@ -3,7 +3,6 @@
 
 /* Defines the Player of the games */
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <allegro5/allegro5.h>
