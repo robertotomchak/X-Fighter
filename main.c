@@ -28,23 +28,52 @@
 #define SIZE_Y_INF 5
 #define DMG_INF 5
 
-int main ()
+// game loop for start screen
+// returns status (quit or started)
+short start_screen(ALLEGRO_EVENT_QUEUE *queue)
 {
-    al_init();
-    al_init_primitives_addon();
-    al_install_keyboard();
-
-    ALLEGRO_TIMER *timer = al_create_timer(1.0 / FPS);
-    ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
-    ALLEGRO_DISPLAY *disp = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    al_register_event_source(queue, al_get_keyboard_event_source());
-    al_register_event_source(queue, al_get_display_event_source(disp));
-    al_register_event_source(queue, al_get_timer_event_source(timer));
-
     ALLEGRO_EVENT event;
-    al_start_timer(timer);
+    short status = STAY;
+    while (status == STAY) {
+        al_wait_for_event(queue, &event);
+        if (event.type == ALLEGRO_EVENT_TIMER) {
+            al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_flip_display();
+        }
+        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            status = QUIT;
+        else if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+            status = START;
+    }
+    return status;
+}
 
+// game loop for select screen
+// returns status (quit or selected); puts selected choices in <choices>
+short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices)
+{
+    ALLEGRO_EVENT event;
+    Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
+                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_ENTER);
+    short status = STAY;
+    while (status == STAY) {
+        al_wait_for_event(queue, &event);
+        if (event.type == ALLEGRO_EVENT_TIMER)
+            draw_select_screen(sscreen);
+        status = update_select_screen(sscreen, event.type, event.keyboard.keycode);
+    }
+    get_choices(sscreen, choices);
+    destroy_select_screen(sscreen);
+    return status;
+}
+
+// game loop for select screen
+// returns status (quit or victory); puts winner (0 or 1) in <p1_won>
+short fight_loop(ALLEGRO_EVENT_QUEUE *queue, bool *p1_won)
+{
+    ALLEGRO_EVENT event;
+    short status = STAY;
+    // creating players and screens
     Hit *h_sup1 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
     Hit *h_inf1 = create_hit(SIZE_X_INF, SIZE_Y_INF, OFFSET_INF, DMG_INF);
     Hit *h_sup2 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
@@ -57,26 +86,75 @@ int main ()
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, al_map_rgb(0, 255, 0)); 
     Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
-    Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
-                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_ENTER);
 
-    short health1 = p1->health, health2 = p2->health, status = STAY;
-    printf("%d %d\n", health1, health2);
-    while (status == STAY) {
+    while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER)
-            draw_select_screen(sscreen);
-        status = update_select_screen(sscreen, event.type, event.keyboard.keycode);
+            draw_fight_screen(fscreen);
+        status = update_fight_screen(fscreen, event.type, event.keyboard.keycode);
+        if (status == VICTORY_P1)
+            printf("Player 1 won match!\n");
+        else if (status == VICTORY_P2)
+            printf("Player 2 won match!\n");
     }
+    if (game_over(fscreen) == -1)
+        *p1_won = true;
+    else
+        *p1_won = false;
+    destroy_fight_screen(fscreen);
+    return status;
+}
+
+int main ()
+{
+    // allegro initializations
+    al_init();
+    al_init_primitives_addon();
+    al_install_keyboard();
+
+    ALLEGRO_TIMER *timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
+    ALLEGRO_DISPLAY *disp = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_display_event_source(disp));
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+
+    al_start_timer(timer);
+
+    // auxiliary variables
+    short status;
     Pair choices;
-    get_choices(sscreen, &choices);
-    printf("%d %d\n", choices.x, choices.y);
+    bool p1_won;
+
+    // game loop
+    status = start_screen(queue);
+    if (status == QUIT) {
+        printf("Quitting game\n");
+        return 0;
+    }
+    status = select_loop(queue, &choices);
+    if (status == QUIT) {
+        printf("Quitting game\n");
+        return 0;
+    }
+    printf("Players Selected: %d %d\n", choices.x, choices.y);
+    status = fight_loop(queue, &p1_won);
+    if (status == QUIT) {
+        printf("Quitting game\n");
+        return 0;
+    }
+    else if (p1_won) {
+        printf("Player 1 won the game!\n");
+    }
+    else {
+        printf("Player 2 won the game!\n");
+    }
 
     al_destroy_display(disp);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
-    destroy_fight_screen(fscreen);
-    destroy_select_screen(sscreen);
+    printf("Ending application\n");
     return 0;
 }
