@@ -17,6 +17,9 @@
 #define NO_HIT 0
 #define SUP_HIT 1
 #define INF_HIT 2
+#define NO_DMG 3
+
+#define HIT_TOTAL_FRAMES 5
 
 #define MAX_HEALTH 1000
 
@@ -56,6 +59,7 @@ struct player {
     bool face_right;
     Hit *hit_sup;
     Hit *hit_inf;
+    short hit_frame;
     short hit_status; // NO_HIT, SUP_HIT, INF_HIT, ...
     ALLEGRO_COLOR color;
 };

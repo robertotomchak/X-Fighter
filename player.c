@@ -49,6 +49,7 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->health = MAX_HEALTH; // starts at full health
     p->hit_sup = hit_sup;
     p->hit_inf = hit_inf;
+    p->hit_frame = 0;
     p->hit_status = NO_HIT;
 
     p->face_right = true;  // by default, look right
@@ -141,15 +142,13 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->joystick.up.active = 1;
         else if (key == p->joystick.down.keycode)
             p->joystick.down.active ^= 1;
-        else if (key == p->joystick.hit_sup.keycode) {
-            p->joystick.hit_sup.active ^= 1;
-            if (p->hit_status != INF_HIT)
-                p->hit_status = p->joystick.hit_sup.active? SUP_HIT: NO_HIT;
+        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->hit_status == NO_HIT) {
+            p->joystick.hit_sup.active = 1;
+            p->hit_status = SUP_HIT;
         }
-        else if (key == p->joystick.hit_inf.keycode) {
-            p->joystick.hit_inf.active ^= 1;
-            if (p->hit_status != SUP_HIT)
-                p->hit_status = p->joystick.hit_inf.active? INF_HIT: NO_HIT;
+        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->hit_status == NO_HIT) {
+            p->joystick.hit_inf.active = 1;
+            p->hit_status = INF_HIT;
         }
         // players can only hit if standing
         if (p->status != STANDING)
@@ -202,10 +201,25 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     }
 
     // update health (if takes damage)
-    if (p_other->hit_status == SUP_HIT && player_hit(p, p_other->hit_sup, p_other->face_right))
+    if (p_other->hit_status == SUP_HIT && player_hit(p, p_other->hit_sup, p_other->face_right)) {
         p->health = max(0, p->health - p_other->hit_sup->damage);
-    else if (p_other->hit_status == INF_HIT && player_hit(p, p_other->hit_inf, p_other->face_right))
+        p_other->hit_status = NO_DMG;
+    }
+    else if (p_other->hit_status == INF_HIT && player_hit(p, p_other->hit_inf, p_other->face_right)) {
         p->health = max(0, p->health - p_other->hit_inf->damage);
+        p_other->hit_status = NO_DMG;
+    }
+        
+    // update hitting state
+    if (p->hit_status != NO_HIT)
+        p->hit_frame = (p->hit_frame + 1) % HIT_TOTAL_FRAMES;
+
+    if (p->hit_frame == 0) {
+        p->joystick.hit_sup.active = 0;
+        p->joystick.hit_inf.active = 0;
+        p->hit_status = NO_HIT;
+    }
+        
     
     // update facing side
     if ((p->coords.x < p_other->coords.x) != p->face_right)
