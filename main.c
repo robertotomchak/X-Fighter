@@ -9,7 +9,7 @@
 #include "select_screen.h"
 
 #define FPS 30
-#define SCREEN_WIDTH 700
+#define SCREEN_WIDTH 1120
 #define SCREEN_HEIGHT 700
 #define GRAVITY 1
 

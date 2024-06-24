@@ -4,10 +4,18 @@
 /* Defines the screen where the players are fighting */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "auxiliary.h"
 #include "player.h"
 #include "screen_status_defines.h"
+#include "health_bar.h"
+
+// health bar defines (all are %)
+#define HP_BAR_MARGIN_X 10
+#define HP_BAR_MARGIN_Y 10
+#define HP_BAR_SIZE_X 35
+#define HP_BAR_SIZE_Y 5
 
 struct fight_screen {
     Pair size;
@@ -17,6 +25,8 @@ struct fight_screen {
     Player *p2;
     int player_x_offset;  // distance from side of screen that players start;
     int gravity;
+    Health_Bar *p1_hp;
+    Health_Bar *p2_hp;
 };
 typedef struct fight_screen Fight_Screen;
 
