@@ -96,5 +96,7 @@ void destroy_fight_screen(Fight_Screen *screen)
 {
     kill_player(screen->p1);
     kill_player(screen->p2);
+	destroy_health_bar(screen->p1_hp);
+	destroy_health_bar(screen->p2_hp);
     free(screen); screen = NULL;
 }

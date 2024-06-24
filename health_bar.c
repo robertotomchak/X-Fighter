@@ -26,6 +26,8 @@ Health_Bar *create_health_bar(short x, short y, short size_x, short size_y, bool
     hb->inverted = inverted;
     hb->max_health = max_health;
     hb->health = max_health; // starts at full
+
+	return hb;
 }
 
 // updates given health bar with player's health
