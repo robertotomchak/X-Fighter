@@ -9,6 +9,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #include "auxiliary.h"
+#include "sprite.h"
 
 #define STANDING 0
 #define CROUCH 1
@@ -61,7 +62,7 @@ struct player {
     Hit *hit_inf;
     short hit_frame;
     short hit_status; // NO_HIT, SUP_HIT, INF_HIT, ...
-    ALLEGRO_COLOR color;
+    Sprite *img;
 };
 typedef struct player Player;
 
@@ -69,7 +70,7 @@ typedef struct player Player;
 Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage);
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color);
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path);
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits

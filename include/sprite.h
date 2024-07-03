@@ -1,7 +1,15 @@
+#ifndef SPRITE_H
+#define SPRITE_H
 /*
     Defines a sprite object, which can draw images based on a sprite file
     Sprite must be one row and <num> columns
 */
+
+// defines of sprites of this project
+#define SPRITE_WIDTH 200
+#define SPRITE_HEIGHT 120
+#define NUM_SPRITES 8
+#define CORRECTION_RATIO 1.25  // make sprite have the correct height
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -23,7 +31,10 @@ struct sprite {
 typedef struct sprite Sprite;
 
 // creates a sprite object
-Sprite *create_sprite(const char *filename, long source_size_x, long source_size_y, long dest_size_x, long dest_size_y, int num);
+Sprite *create_sprite(const char *filename, long source_size_x, long source_size_y, int num);
+
+// resizes based on given height
+void resize_sprite_by_height(Sprite *img, long height);
 
 // defines wanted sprite index
 void set_sprite_index(Sprite *img, int index);
@@ -37,3 +48,5 @@ void draw_sprite(Sprite *img, bool reverse);
 
 // frees memory
 void destroy_sprite (Sprite *img);
+
+#endif

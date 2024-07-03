@@ -3,20 +3,22 @@
 #include <stdio.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_image.h>
 
 #include "player.h"
 #include "fight_screen.h"
 #include "select_screen.h"
+#include "sprite.h"
 
 #define FPS 30
-#define SCREEN_WIDTH 1120
-#define SCREEN_HEIGHT 700
+#define SCREEN_WIDTH 1300
+#define SCREEN_HEIGHT 800
 #define GRAVITY 1
 
-#define PLAYER_WIDTH 30
-#define PLAYER_HEIGHT 100
+#define PLAYER_WIDTH 200
+#define PLAYER_HEIGHT 300
 #define SPEED_X 10
-#define JUMP_SPEED 30
+#define JUMP_SPEED 25
 
 #define OFFSET_SUP 70
 #define SIZE_X_SUP 40
@@ -27,6 +29,16 @@
 #define SIZE_X_INF 20
 #define SIZE_Y_INF 5
 #define DMG_INF 5
+
+#define RED_PLAYER 0
+#define YELLOW_PLAYER 1
+#define BLUE_PLAYER 2
+#define GREEN_PLAYER 3
+
+#define RED_SPRITE_PATH "assets/red_sprite.png"
+#define YELLOW_SPRITE_PATH "assets/yellow_sprite.png"
+#define BLUE_SPRITE_PATH "assets/blue_sprite.png"
+#define GREEN_SPRITE_PATH "assets/green_sprite.png"
 
 // game loop for start screen
 // returns status (quit or started)
@@ -69,11 +81,47 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices)
 
 // game loop for select screen
 // returns status (quit or victory); puts winner (0 or 1) in <p1_won>
-short fight_loop(ALLEGRO_EVENT_QUEUE *queue, bool *p1_won)
+short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, bool *p1_won)
 {
     ALLEGRO_EVENT event;
     short status = STAY;
     // creating players and screens
+    char *sprite1, *sprite2;
+    switch (p1_index) {
+        case RED_PLAYER:
+            sprite1 = RED_SPRITE_PATH;
+            break;
+        case YELLOW_PLAYER:
+            sprite1 = YELLOW_SPRITE_PATH;
+            break;
+        case BLUE_PLAYER:
+            sprite1 = BLUE_SPRITE_PATH;
+            break;
+        case GREEN_PLAYER:
+            sprite1 = GREEN_SPRITE_PATH;
+            break;
+        default:
+            printf("ERROR! NON VALID PLAYER\n");
+            return 0;
+    }
+    switch (p2_index) {
+        case RED_PLAYER:
+            sprite2 = RED_SPRITE_PATH;
+            break;
+        case YELLOW_PLAYER:
+            sprite2 = YELLOW_SPRITE_PATH;
+            break;
+        case BLUE_PLAYER:
+            sprite2 = BLUE_SPRITE_PATH;
+            break;
+        case GREEN_PLAYER:
+            sprite2 = GREEN_SPRITE_PATH;
+            break;
+        default:
+            printf("ERROR! NON VALID PLAYER\n");
+            return 0;
+    }
+
     Hit *h_sup1 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
     Hit *h_inf1 = create_hit(SIZE_X_INF, SIZE_Y_INF, OFFSET_INF, DMG_INF);
     Hit *h_sup2 = create_hit(SIZE_X_SUP, SIZE_Y_SUP, OFFSET_SUP, DMG_SUP);
@@ -81,10 +129,10 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, bool *p1_won)
 
     Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_E, ALLEGRO_KEY_R,
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
-                        h_sup1, h_inf1, al_map_rgb(255, 0, 0));
+                        h_sup1, h_inf1, sprite1);
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
-                        h_sup2, h_inf2, al_map_rgb(0, 255, 0)); 
+                        h_sup2, h_inf2, sprite2); 
     Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
 
     while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
@@ -111,6 +159,7 @@ int main ()
     al_init();
     al_init_primitives_addon();
     al_install_keyboard();
+    al_init_image_addon();
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / FPS);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
@@ -139,7 +188,7 @@ int main ()
         return 0;
     }
     printf("Players Selected: %d %d\n", choices.x, choices.y);
-    status = fight_loop(queue, &p1_won);
+    status = fight_loop(queue, choices.x, choices.y, &p1_won);
     if (status == QUIT) {
         printf("Quitting game\n");
         return 0;

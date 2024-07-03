@@ -15,7 +15,7 @@ Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage)
 }
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, ALLEGRO_COLOR color)
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path)
 {
     Player *p = malloc(sizeof(Player));
     if (!p)
@@ -59,7 +59,8 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->hit_inf->coords.x = p->coords.x + p->size.x;
     p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
 
-    p->color = color;
+    p->img = create_sprite(sprite_path, SPRITE_WIDTH, SPRITE_HEIGHT, NUM_SPRITES);
+    resize_sprite_by_height(p->img, CORRECTION_RATIO * size_y);
 
     return p;
 }
@@ -245,18 +246,20 @@ void draw_player(Player *p)
 {
     int end_hit_x;
     if (p->status == CROUCH)
-        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, p->color);
+        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
     else
-        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, p->color);
+        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
     
     if (p->hit_status == SUP_HIT) {
         end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
-        al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, p->color);
+        al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, al_map_rgb(255, 0, 0));
     }
     else if (p->hit_status == INF_HIT) {
         end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
-        al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, p->color);
+        al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, al_map_rgb(255, 0, 0));
     }
+    set_sprite_coords(p->img, p->coords.x + p->size.x / 2, p->coords.y);
+    draw_sprite(p->img, !p->face_right);
 }
 
 // defines if match is over, and who won
