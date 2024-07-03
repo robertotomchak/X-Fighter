@@ -59,6 +59,8 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->hit_inf->coords.x = p->coords.x + p->size.x;
     p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
 
+    p->sprite_status = NORMAL1;
+    p->frames = 0;
     p->img = create_sprite(sprite_path, SPRITE_WIDTH, SPRITE_HEIGHT, NUM_SPRITES);
     resize_sprite_by_height(p->img, CORRECTION_RATIO * size_y);
 
@@ -121,6 +123,57 @@ bool player_hit(Player *p, Hit *hit, bool orientation) {
     return col_x && col_y;
 }
 
+// updates player's sprite
+void update_player_sprite(Player *p)
+{
+    switch (p->sprite_status) {
+        case NORMAL1:
+            // change to walking
+            if (p->status == STANDING && (p->joystick.left.active || p->joystick.right.active)) {
+                if (p->frames >= WALK_FRAMES) {
+                    p->sprite_status = WALK1;
+                    p->frames = 0;
+                }
+            }
+            else
+                p->frames = 0;
+        break;
+        case NORMAL2:
+            // change to walking
+            if (p->status == STANDING && (p->joystick.left.active || p->joystick.right.active)) {
+                if (p->frames >= WALK_FRAMES) {
+                    p->sprite_status = WALK2;
+                    p->frames = 0;
+                }
+            }
+            else
+                p->frames = 0;
+        break;
+        case WALK1:
+            // change to walking
+            if (p->frames >= WALK_FRAMES) {
+                p->sprite_status = NORMAL2;
+                p->frames = 0;
+            }
+        break;
+        case WALK2:
+            // change to walking
+            if (p->frames >= WALK_FRAMES) {
+                p->sprite_status = NORMAL1;
+                p->frames = 0;
+            }
+        break;
+        case CROUCH_SPRITE:
+            p->frames = 0;
+            if (p->status != CROUCH)
+                p->sprite_status = NORMAL1;
+        break;
+    }
+    if (p->status == CROUCH)
+        p->sprite_status = CROUCH_SPRITE;
+    set_sprite_index(p->img, p->sprite_status);
+}
+
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
 // deals with collision with p_other
@@ -156,6 +209,7 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->hit_status = NO_HIT;
         return;
     }
+    update_player_sprite(p);
 
     // if update screen, move player and update status if necessary
     if (event != ALLEGRO_EVENT_TIMER)
@@ -244,6 +298,7 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 // draws player
 void draw_player(Player *p)
 {
+    p->frames += 1;
     int end_hit_x;
     if (p->status == CROUCH)
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));

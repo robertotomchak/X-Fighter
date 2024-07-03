@@ -62,6 +62,8 @@ struct player {
     Hit *hit_inf;
     short hit_frame;
     short hit_status; // NO_HIT, SUP_HIT, INF_HIT, ...
+    short frames;  // number of frames in present sprite
+    short sprite_status;
     Sprite *img;
 };
 typedef struct player Player;
