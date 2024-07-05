@@ -245,9 +245,9 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->joystick.up.active = 1;
         else if (key == p->joystick.down.keycode)
             p->joystick.down.active ^= 1;
-        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
+        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING)
             p->joystick.hit_sup.active = 1;
-        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
+        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING)
             p->joystick.hit_inf.active = 1;
     }
     update_player_state(p, max_screen);
