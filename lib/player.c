@@ -44,13 +44,12 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->speed.x = speed_x;
     p->speed.y = 0;  // starts on ground
     p->jump_speed = jump_speed;
-    p->status = STANDING;
+    p->state = STANDING;
 
     p->health = MAX_HEALTH; // starts at full health
     p->hit_sup = hit_sup;
     p->hit_inf = hit_inf;
-    p->hit_frame = 0;
-    p->hit_status = NO_HIT;
+    p->hit_dmg = false;
 
     p->face_right = true;  // by default, look right
     // update hits coordinates
@@ -59,8 +58,8 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->hit_inf->coords.x = p->coords.x + p->size.x;
     p->hit_inf->coords.y = p->coords.y - p->size.y * p->hit_inf->offset / 100;
 
-    p->sprite_status = NORMAL1;
-    p->frames = 0;
+    p->sprite_status = NORMAL1_SPRITE;
+    p->n_frames = 0;
     p->img = create_sprite(sprite_path, SPRITE_WIDTH, SPRITE_HEIGHT, NUM_SPRITES);
     resize_sprite_by_height(p->img, CORRECTION_RATIO * size_y);
 
@@ -89,9 +88,9 @@ bool collision_y(Player *p1, Player *p2)
     int h1, h2;
     h1 = p1->size.y;
     h2 = p2->size.y;
-    if (p1->status == CROUCH)
+    if (p1->state == CROUCH)
         h1 /=  2;
-    if (p2->status == CROUCH)
+    if (p2->state == CROUCH)
         h2 /= 2;
 
     return (p1->coords.y <= p2->coords.y && p1->coords.y > p2->coords.y - h2) || (p2->coords.y <= p1->coords.y && p2->coords.y > p1->coords.y - h1);
@@ -104,7 +103,7 @@ bool player_hit(Player *p, Hit *hit, bool orientation) {
     bool col_y, col_x;  // collisions
 
     h = p->size.y;
-    if (p->status == CROUCH)
+    if (p->state == CROUCH)
         h /=  2;
 
     if (orientation) {
@@ -123,54 +122,104 @@ bool player_hit(Player *p, Hit *hit, bool orientation) {
     return col_x && col_y;
 }
 
+// updated player's state
+void update_player_state(Player *p, Pair max_screen)
+{
+    switch (p->state) {
+        case STANDING:
+            if (p->joystick.down.active)
+                p->state = CROUCH;
+            else if (p->joystick.up.active) {
+                p->state = AIR;
+                p->speed.y = -p->jump_speed;
+            }
+            else if (p->joystick.hit_inf.active) {
+                p->state = KICK;
+                p->hit_dmg = true;
+            }
+            else if (p->joystick.hit_sup.active)
+                p->state = PREP;
+        break;
+        case CROUCH:
+            if (!p->joystick.down.active)
+                p->state = STANDING;
+        break;
+        case AIR:
+            if (p->coords.y >= max_screen.y && p->speed.y > 0) {
+                p->state = STANDING;
+                p->joystick.up.active = 0;
+            }
+        break;
+        case KICK:
+            if (p->n_frames >= KICK_FRAMES) {
+                p->state = STANDING;
+                p->n_frames = 0;
+                p->joystick.hit_inf.active = 0;
+                p->hit_dmg = false;
+            }
+        break;
+        case PREP:
+            if (p->n_frames >= PREP_FRAMES) {
+                p->state = PUNCH;
+                p->n_frames = 0;
+                p->hit_dmg = true;
+            }
+        break;
+        case PUNCH:
+            if (p->n_frames >= PUNCH_FRAMES) {
+                p->state = STANDING;
+                p->n_frames = 0;
+                p->joystick.hit_sup.active = 0;
+                p->hit_dmg = false;
+            }
+        break;
+        // should never happen
+        default:
+            printf("ERROR: NON VALID STATE\n");
+        break;
+    }
+}
+
 // updates player's sprite
 void update_player_sprite(Player *p)
 {
-    switch (p->sprite_status) {
-        case NORMAL1:
-            // change to walking
-            if (p->status == STANDING && (p->joystick.left.active || p->joystick.right.active)) {
-                if (p->frames >= WALK_FRAMES) {
-                    p->sprite_status = WALK1;
-                    p->frames = 0;
-                }
-            }
-            else
-                p->frames = 0;
+    // based on player's state
+    switch (p->state) {
+        case CROUCH:
+            p->sprite_status = CROUCH_SPRITE;
         break;
-        case NORMAL2:
-            // change to walking
-            if (p->status == STANDING && (p->joystick.left.active || p->joystick.right.active)) {
-                if (p->frames >= WALK_FRAMES) {
-                    p->sprite_status = WALK2;
-                    p->frames = 0;
-                }
-            }
-            else
-                p->frames = 0;
+        case AIR:
+            p->sprite_status = NORMAL1_SPRITE;
         break;
-        case WALK1:
-            // change to walking
-            if (p->frames >= WALK_FRAMES) {
-                p->sprite_status = NORMAL2;
-                p->frames = 0;
-            }
+        case PREP:
+            p->sprite_status = PREP_SPRITE;
         break;
-        case WALK2:
-            // change to walking
-            if (p->frames >= WALK_FRAMES) {
-                p->sprite_status = NORMAL1;
-                p->frames = 0;
+        case PUNCH:
+            p->sprite_status = PUNCH_SPRITE;
+        break;
+        case KICK:
+            p->sprite_status = KICK_SPRITE;
+        break;
+        // walking is more complicated
+        case STANDING:
+            // not walking
+            if (!p->joystick.left.active && !p->joystick.right.active) {
+                if (p->sprite_status == NORMAL2_SPRITE || p->sprite_status == WALK1_SPRITE)
+                    p->sprite_status = NORMAL2_SPRITE;
+                else
+                    p->sprite_status = NORMAL1_SPRITE;
+                p->n_frames = 0;
+            }
+            // walking and needs to go to next sprite
+            else if (p->n_frames >= WALK_FRAMES) {
+                p->sprite_status = (p->sprite_status + 1) % TOTAL_WALK_SPRITES;
+                p->n_frames = 0;
             }
         break;
-        case CROUCH_SPRITE:
-            p->frames = 0;
-            if (p->status != CROUCH)
-                p->sprite_status = NORMAL1;
+        default:
+            printf("ERROR: NON VALID STATE!\n");
         break;
     }
-    if (p->status == CROUCH)
-        p->sprite_status = CROUCH_SPRITE;
     set_sprite_index(p->img, p->sprite_status);
 }
 
@@ -182,9 +231,9 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     int h, h_other;
     h = p->size.y;
     h_other = p_other->size.y;
-    if (p->status == CROUCH)
+    if (p->state == CROUCH)
         h /= 2;
-    if (p_other->status == CROUCH)
+    if (p_other->state == CROUCH)
         h_other /= 2;
     // if key pressed or release, update joystick
     if (event == ALLEGRO_EVENT_KEY_DOWN || event == ALLEGRO_EVENT_KEY_UP) {
@@ -192,53 +241,43 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->joystick.left.active ^= 1;
         else if (key == p->joystick.right.keycode)
             p->joystick.right.active ^= 1;
-        else if (key == p->joystick.up.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->status == STANDING)
+        else if (key == p->joystick.up.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
             p->joystick.up.active = 1;
         else if (key == p->joystick.down.keycode)
             p->joystick.down.active ^= 1;
-        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->hit_status == NO_HIT) {
+        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
             p->joystick.hit_sup.active = 1;
-            p->hit_status = SUP_HIT;
-        }
-        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->hit_status == NO_HIT) {
+        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
             p->joystick.hit_inf.active = 1;
-            p->hit_status = INF_HIT;
-        }
-        // players can only hit if standing
-        if (p->status != STANDING)
-            p->hit_status = NO_HIT;
-        return;
     }
+    update_player_state(p, max_screen);
     update_player_sprite(p);
 
     // if update screen, move player and update status if necessary
     if (event != ALLEGRO_EVENT_TIMER)
         return;
 
-    if (p->joystick.left.active) {
-        // other player at left
-        if (p_other->coords.x + p_other->size.x <= p->coords.x && collision_y(p, p_other))
-            min_screen.x = p_other->coords.x + p_other->size.x;
-        p->coords.x = max(min_screen.x, p->coords.x - p->speed.x);
+    // horizontal movement (only allowed in air and standing states)
+    if (p->state == STANDING || p->state == AIR) {
+        if (p->joystick.left.active) {
+            // other player at left
+            if (p_other->coords.x + p_other->size.x <= p->coords.x && collision_y(p, p_other))
+                min_screen.x = p_other->coords.x + p_other->size.x;
+            p->coords.x = max(min_screen.x, p->coords.x - p->speed.x);
+        }
+        if (p->joystick.right.active) {
+            // other player at right
+            if (p->coords.x + p->size.x <= p_other->coords.x && collision_y(p, p_other))
+                max_screen.x = p_other->coords.x;
+            p->coords.x = min(max_screen.x - p->size.x, p->coords.x + p->speed.x);
+        }
     }
-    if (p->joystick.right.active) {
-        // other player at right
-        if (p->coords.x + p->size.x <= p_other->coords.x && collision_y(p, p_other))
-            max_screen.x = p_other->coords.x;
-        p->coords.x = min(max_screen.x - p->size.x, p->coords.x + p->speed.x);
-    }
-    if (p->joystick.up.active) {
-        p->status = AIR;
-        p->speed.y = -p->jump_speed;
-        p->joystick.up.active = 0;
-    }
+
     // vertical movement (only if player is on the air and not on the top of the other)
-    if (p->status == AIR && !(collision_x(p, p_other) && p->coords.y == p_other->coords.y - h_other)) {
+    if (p->state == AIR && !(collision_x(p, p_other) && p->coords.y == p_other->coords.y - h_other)) {
         move_player_y(p, min_screen.y, max_screen.y, gravity);
-        if (p->coords.y >= max_screen.y)
-            p->status = p->joystick.down.active? CROUCH: STANDING;
         // collision with other player
-        else if (collision_x(p, p_other) && collision_y(p, p_other)) {
+        if (collision_x(p, p_other) && collision_y(p, p_other)) {
             // other player is above
             if (p->speed.y < 0)
                 p->coords.y = p_other->coords.y + h;
@@ -248,34 +287,17 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->speed.y = 0;               
         }
     }
-    else if (p->status != AIR) {
-        if (p->joystick.down.active)
-            p->status = CROUCH;
-        else
-            p->status = STANDING;
-    }
 
     // update health (if takes damage)
-    if (p_other->hit_status == SUP_HIT && player_hit(p, p_other->hit_sup, p_other->face_right)) {
+    if (p_other->hit_dmg && p_other->state == PUNCH && player_hit(p, p_other->hit_sup, p_other->face_right)) {
         p->health = max(0, p->health - p_other->hit_sup->damage);
-        p_other->hit_status = NO_DMG;
+        p_other->hit_dmg = false;
     }
-    else if (p_other->hit_status == INF_HIT && player_hit(p, p_other->hit_inf, p_other->face_right)) {
+    else if (p_other->hit_dmg && p_other->state == KICK && player_hit(p, p_other->hit_inf, p_other->face_right)) {
         p->health = max(0, p->health - p_other->hit_inf->damage);
-        p_other->hit_status = NO_DMG;
+        p_other->hit_dmg = false;
     }
         
-    // update hitting state
-    if (p->hit_status != NO_HIT)
-        p->hit_frame = (p->hit_frame + 1) % HIT_TOTAL_FRAMES;
-
-    if (p->hit_frame == 0) {
-        p->joystick.hit_sup.active = 0;
-        p->joystick.hit_inf.active = 0;
-        p->hit_status = NO_HIT;
-    }
-        
-    
     // update facing side
     if ((p->coords.x < p_other->coords.x) != p->face_right)
         p->face_right = p->coords.x < p_other->coords.x;
@@ -298,18 +320,18 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 // draws player
 void draw_player(Player *p)
 {
-    p->frames += 1;
+    p->n_frames += 1;
     int end_hit_x;
-    if (p->status == CROUCH)
+    if (p->state == CROUCH)
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
     else
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
     
-    if (p->hit_status == SUP_HIT) {
+    if (p->state == PUNCH) {
         end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
         al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, al_map_rgb(255, 0, 0));
     }
-    else if (p->hit_status == INF_HIT) {
+    else if (p->state == KICK) {
         end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
         al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, al_map_rgb(255, 0, 0));
     }
@@ -334,10 +356,12 @@ void reset_player(Player *p, int x, int y)
     p->coords.x = x;
     p->coords.y = y;
     p->health = MAX_HEALTH;
-    p->status = STANDING;
-    p->hit_status = NO_HIT;
+    p->state = STANDING;
+    p->sprite_status = NORMAL1_SPRITE;
+    p->hit_dmg = false;
     p->face_right = true;
     p->speed.y = 0;  // starts on ground
+    p->n_frames = 0;
 }
 
 // kills player (probably not in a painfull way) by freeing its memory

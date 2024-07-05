@@ -4,6 +4,7 @@
 /* Defines the Player of the games */
 #include <stdbool.h>
 #include <stdlib.h>
+#include "stdio.h"
 
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
@@ -14,13 +15,9 @@
 #define STANDING 0
 #define CROUCH 1
 #define AIR 2
-
-#define NO_HIT 0
-#define SUP_HIT 1
-#define INF_HIT 2
-#define NO_DMG 3
-
-#define HIT_TOTAL_FRAMES 5
+#define PREP 3
+#define PUNCH 4
+#define KICK 5
 
 #define MAX_HEALTH 1000
 
@@ -56,13 +53,12 @@ struct player {
     Pair speed;
     short jump_speed;
     short health;
-    short status;  // STANDING, AIR, ...
+    short state;  // STANDING, AIR, ...
     bool face_right;
     Hit *hit_sup;
     Hit *hit_inf;
-    short hit_frame;
-    short hit_status; // NO_HIT, SUP_HIT, INF_HIT, ...
-    short frames;  // number of frames in present sprite
+    bool hit_dmg; // a hit cannot deal damage multiple times
+    short n_frames;  // number of frames in present sprite
     short sprite_status;
     Sprite *img;
 };

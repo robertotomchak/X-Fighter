@@ -12,21 +12,21 @@
 #define CORRECTION_RATIO 1.25  // make sprite have the correct height
 
 // name of each sprite
-#define NORMAL1 0
-#define WALK1 1
-#define NORMAL2 2
-#define WALK2 3
-#define KICK 4
-#define PUNCH1 5
-#define PUNCH2 6
+#define NORMAL1_SPRITE 0
+#define WALK1_SPRITE 1
+#define NORMAL2_SPRITE 2
+#define WALK2_SPRITE 3
+#define KICK_SPRITE 4
+#define PREP_SPRITE 5
+#define PUNCH_SPRITE 6
 #define CROUCH_SPRITE 7
 
 // number of frames that stays in sprite
 #define WALK_FRAMES 10
-#define AIR_FRAMES 0
-#define CRAWL_FRAMES 0
+#define PREP_FRAMES 30
 #define PUNCH_FRAMES 30
 #define KICK_FRAMES 15
+#define TOTAL_WALK_SPRITES 4
 
 #include <stdbool.h>
 #include <stdlib.h>
