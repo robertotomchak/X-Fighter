@@ -24,7 +24,7 @@
 // number of frames that stays in sprite
 #define WALK_FRAMES 10
 #define PREP_FRAMES 30
-#define PUNCH_FRAMES 30
+#define PUNCH_FRAMES 15
 #define KICK_FRAMES 15
 #define TOTAL_WALK_SPRITES 4
 
