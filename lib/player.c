@@ -15,7 +15,7 @@ Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage)
 }
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path)
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path, bool face_right)
 {
     Player *p = malloc(sizeof(Player));
     if (!p)
@@ -51,7 +51,7 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->hit_inf = hit_inf;
     p->hit_dmg = false;
 
-    p->face_right = true;  // by default, look right
+    p->face_right = face_right;
     // update hits coordinates
     p->hit_sup->coords.x = p->coords.x + p->size.x;
     p->hit_sup->coords.y = p->coords.y - p->size.y * p->hit_sup->offset / 100;
@@ -299,8 +299,7 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     }
         
     // update facing side
-    if ((p->coords.x < p_other->coords.x) != p->face_right)
-        p->face_right = p->coords.x < p_other->coords.x;
+    p->face_right = p->coords.x < p_other->coords.x;
 
     // update hits coordinates
     if (p->face_right) {

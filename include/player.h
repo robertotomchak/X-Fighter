@@ -68,7 +68,7 @@ typedef struct player Player;
 Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage);
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path);
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path, bool face_right);
 
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
