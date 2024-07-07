@@ -17,6 +17,12 @@
 #define HP_BAR_SIZE_X 35
 #define HP_BAR_SIZE_Y 5
 
+// stamina bar defines (all are %)
+#define STA_BAR_MARGIN_X 10
+#define STA_BAR_MARGIN_Y 20
+#define STA_BAR_SIZE_X 25
+#define STA_BAR_SIZE_Y 3
+
 struct fight_screen {
     Pair size;
     short n_rounds;  // how many rounds will be played
@@ -25,8 +31,10 @@ struct fight_screen {
     Player *p2;
     int player_x_offset;  // distance from side of screen that players start;
     int gravity;
-    Var_Bar *p1_hp;
+    Var_Bar *p1_hp;  // hp = health_bar
     Var_Bar *p2_hp;
+    Var_Bar *p1_sta;  // sta = stamina_bar
+    Var_Bar *p2_sta;
 };
 typedef struct fight_screen Fight_Screen;
 

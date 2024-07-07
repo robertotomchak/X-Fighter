@@ -41,5 +41,12 @@
 
 // health/stamina
 #define MAX_HEALTH 1000
+#define MAX_STAMINA 1000
+
+// stamina costs
+#define CROUCH_STAMINA 20
+#define JUMP_STAMINA 100
+#define PUNCH_STAMINA 200
+#define KICK_STAMINA 100
 
 #endif

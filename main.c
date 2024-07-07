@@ -29,6 +29,7 @@
 #define SIZE_X_INF 35
 #define SIZE_Y_INF 55
 #define DMG_INF 25
+#define STAMINA_SPEED 5
 
 #define RED_PLAYER 0
 #define YELLOW_PLAYER 1
@@ -129,10 +130,10 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, bool *p
 
     Player *p1 = create_player(ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_E, ALLEGRO_KEY_R,
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
-                        h_sup1, h_inf1, sprite1, true);
+                        h_sup1, h_inf1, sprite1, true, STAMINA_SPEED);
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
-                        h_sup2, h_inf2, sprite2, false); 
+                        h_sup2, h_inf2, sprite2, false, STAMINA_SPEED); 
     Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
 
 

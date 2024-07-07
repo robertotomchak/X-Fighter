@@ -15,7 +15,7 @@ Hit *create_hit(short size_x, short size_y, short offset, unsigned short damage)
 }
 
 // creates a player
-Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path, bool face_right)
+Player *create_player(short up, short left, short down, short right, short k_hit_sup, short k_hit_inf, short size_x, short size_y, short speed_x, short jump_speed, Hit *hit_sup, Hit *hit_inf, const char *sprite_path, bool face_right, short stamina_speed)
 {
     Player *p = malloc(sizeof(Player));
     if (!p)
@@ -47,6 +47,8 @@ Player *create_player(short up, short left, short down, short right, short k_hit
     p->state = STANDING;
 
     p->health = MAX_HEALTH; // starts at full health
+    p->stamina = MAX_STAMINA;  // starts at max stamina
+    p->stamina_speed = stamina_speed;
     p->hit_sup = hit_sup;
     p->hit_inf = hit_inf;
     p->hit_dmg = false;
@@ -127,21 +129,24 @@ void update_player_state(Player *p, Pair max_screen)
 {
     switch (p->state) {
         case STANDING:
-            if (p->joystick.down.active)
+            if (p->joystick.down.active && p->stamina >= CROUCH_STAMINA)
                 p->state = CROUCH;
-            else if (p->joystick.up.active) {
+            else if (p->joystick.up.active && p->stamina >= JUMP_STAMINA) {
                 p->state = AIR;
                 p->speed.y = -p->jump_speed;
+                p->stamina -= JUMP_STAMINA;
             }
-            else if (p->joystick.hit_inf.active) {
+            else if (p->joystick.hit_inf.active && p->stamina >= KICK_STAMINA) {
                 p->state = KICK;
                 p->hit_dmg = true;
+                p->stamina -= KICK_STAMINA;
             }
-            else if (p->joystick.hit_sup.active)
+            else if (p->joystick.hit_sup.active && p->stamina >= PUNCH_STAMINA)
                 p->state = PREP;
         break;
         case CROUCH:
-            if (!p->joystick.down.active)
+            p->stamina = max(0, p->stamina - CROUCH_STAMINA);
+            if (!p->joystick.down.active || p->stamina == 0)
                 p->state = STANDING;
         break;
         case AIR:
@@ -163,6 +168,7 @@ void update_player_state(Player *p, Pair max_screen)
                 p->state = PUNCH;
                 p->n_frames = 0;
                 p->hit_dmg = true;
+                p->stamina -= PUNCH_STAMINA;
             }
         break;
         case PUNCH:
@@ -254,8 +260,14 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     update_player_sprite(p);
 
     // if update screen, move player and update status if necessary
-    if (event != ALLEGRO_EVENT_TIMER)
-        return;
+    if (event != ALLEGRO_EVENT_TIMER) {
+            return;
+    }
+
+    // update number of frames and stamina (only recover if in standing state)
+    p->n_frames += 1;
+    if (p->state == STANDING)
+        p->stamina = min(MAX_STAMINA, p->stamina + p->stamina_speed);
 
     // horizontal movement (only allowed in air and standing states)
     if (p->state == STANDING || p->state == AIR) {
@@ -319,7 +331,6 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 // draws player
 void draw_player(Player *p)
 {
-    p->n_frames += 1;
     int end_hit_x;
     if (p->state == CROUCH)
         al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
@@ -355,6 +366,7 @@ void reset_player(Player *p, int x, int y)
     p->coords.x = x;
     p->coords.y = y;
     p->health = MAX_HEALTH;
+    p->stamina = MAX_STAMINA;
     p->state = STANDING;
     p->sprite_status = NORMAL1_SPRITE;
     p->hit_dmg = false;

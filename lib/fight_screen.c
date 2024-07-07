@@ -26,6 +26,8 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
     screen->p1_hp = create_health_bar(HP_BAR_MARGIN_X * width / 100, HP_BAR_MARGIN_Y * height / 100, HP_BAR_SIZE_X * width / 100, HP_BAR_SIZE_Y * height / 100, false, MAX_HEALTH);
     screen->p2_hp = create_health_bar(width - HP_BAR_MARGIN_X * width / 100, HP_BAR_MARGIN_Y * height / 100, HP_BAR_SIZE_X * width / 100, HP_BAR_SIZE_Y * height / 100, true, MAX_HEALTH);
 
+    screen->p1_sta = create_stamina_bar(STA_BAR_MARGIN_X * width / 100, STA_BAR_MARGIN_Y * height / 100, STA_BAR_SIZE_X * width / 100, STA_BAR_SIZE_Y * height / 100, false, MAX_STAMINA);
+    screen->p2_sta = create_stamina_bar(width - STA_BAR_MARGIN_X * width / 100, STA_BAR_MARGIN_Y * height / 100, STA_BAR_SIZE_X * width / 100, STA_BAR_SIZE_Y * height / 100, true, MAX_STAMINA);
     return screen;
 }
 
@@ -44,6 +46,8 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
     update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1);
     update_var_bar(screen->p1_hp, screen->p1->health);
     update_var_bar(screen->p2_hp, screen->p2->health);
+    update_var_bar(screen->p1_sta, screen->p1->stamina);
+    update_var_bar(screen->p2_sta, screen->p2->stamina);
 
     score = round_over(screen->p1, screen->p2);
     if (score != 0) {
@@ -74,6 +78,8 @@ void draw_fight_screen(Fight_Screen *screen)
     draw_player(screen->p2);
     draw_var_bar(screen->p1_hp);
     draw_var_bar(screen->p2_hp);
+    draw_var_bar(screen->p1_sta);
+    draw_var_bar(screen->p2_sta);
     al_flip_display();
 }
 
