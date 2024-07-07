@@ -42,8 +42,8 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
     set_pair(&min_screen, 0, 0);
     update_player(screen->p1, min_screen, screen->size, event, key, screen->gravity, screen->p2);
     update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1);
-    update_health_bar(screen->p1_hp, screen->p1->health);
-    update_health_bar(screen->p2_hp, screen->p2->health);
+    update_var_bar(screen->p1_hp, screen->p1->health);
+    update_var_bar(screen->p2_hp, screen->p2->health);
 
     score = round_over(screen->p1, screen->p2);
     if (score != 0) {
@@ -72,8 +72,8 @@ void draw_fight_screen(Fight_Screen *screen)
     al_clear_to_color(al_map_rgb(0, 0, 0));
     draw_player(screen->p1);
     draw_player(screen->p2);
-    draw_health_bar(screen->p1_hp);
-    draw_health_bar(screen->p2_hp);
+    draw_var_bar(screen->p1_hp);
+    draw_var_bar(screen->p2_hp);
     al_flip_display();
 }
 
@@ -96,7 +96,7 @@ void destroy_fight_screen(Fight_Screen *screen)
 {
     kill_player(screen->p1);
     kill_player(screen->p2);
-	destroy_health_bar(screen->p1_hp);
-	destroy_health_bar(screen->p2_hp);
+	destroy_var_bar(screen->p1_hp);
+	destroy_var_bar(screen->p2_hp);
     free(screen); screen = NULL;
 }

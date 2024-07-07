@@ -12,7 +12,7 @@ all: main
 main: main.o libed | $(OBJ)
 	$(CC) -o main $(OBJ)/*.o $(ALLEGRO)
 
-libed: auxiliary.o fight_screen.o health_bar.o player.o select_screen.o sprite.o
+libed: auxiliary.o fight_screen.o variable_bar.o player.o select_screen.o sprite.o
 
 main.o: main.c 
 	$(CC) -c $(CFLAGS) $< -I $(INCLUDE) -o $(OBJ)/$@

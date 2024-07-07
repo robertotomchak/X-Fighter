@@ -9,7 +9,7 @@
 #include "auxiliary.h"
 #include "player.h"
 #include "screen_status_defines.h"
-#include "health_bar.h"
+#include "variable_bar.h"
 
 // health bar defines (all are %)
 #define HP_BAR_MARGIN_X 10
@@ -25,8 +25,8 @@ struct fight_screen {
     Player *p2;
     int player_x_offset;  // distance from side of screen that players start;
     int gravity;
-    Health_Bar *p1_hp;
-    Health_Bar *p2_hp;
+    Var_Bar *p1_hp;
+    Var_Bar *p2_hp;
 };
 typedef struct fight_screen Fight_Screen;
 
