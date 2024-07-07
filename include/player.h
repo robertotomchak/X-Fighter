@@ -11,15 +11,7 @@
 
 #include "auxiliary.h"
 #include "sprite.h"
-
-#define STANDING 0
-#define CROUCH 1
-#define AIR 2
-#define PREP 3
-#define PUNCH 4
-#define KICK 5
-
-#define MAX_HEALTH 1000
+#include "player_defines.h"
 
 struct key {
     short keycode;
