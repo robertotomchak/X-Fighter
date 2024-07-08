@@ -18,21 +18,25 @@
 // game loop for start screen
 // simple enough that doesn't require a special library for it
 // returns status (quit or started)
+// quit with "x" or ESC
 short start_screen(ALLEGRO_EVENT_QUEUE *queue)
 {
     ALLEGRO_EVENT event;
+    ALLEGRO_BITMAP *background = al_load_bitmap(START_BACKGROUND_PATH);
     short status = STAY;
     while (status == STAY) {
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER) {
             al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_draw_scaled_bitmap(background, 0, 0, START_IMG_WIDTH, START_IMG_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
             al_flip_display();
         }
-        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE || (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ESCAPE))
             status = QUIT;
         else if (event.type == ALLEGRO_EVENT_KEY_DOWN && event.keyboard.keycode == ALLEGRO_KEY_ENTER)
             status = START;
     }
+    al_destroy_bitmap(background);
     return status;
 }
 

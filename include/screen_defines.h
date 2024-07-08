@@ -16,4 +16,8 @@
 #define FIGHT_ELETRICAL_PATH "assets/backgrounds/eletrical_background.png"
 #define FIGHT_MOON_MATH "assets/backgrounds/moon_background.png"
 
+// image dimensions
+#define START_IMG_WIDTH 1300
+#define START_IMG_HEIGHT 800
+
 #endif
