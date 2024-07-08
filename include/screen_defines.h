@@ -10,4 +10,10 @@
 #define VICTORY_P2 4  // who won that round
 #define START 5       // when press start in start screen
 
+// image backgrounds
+#define START_BACKGROUND_PATH "assets/backgrounds/start_background.png"
+#define SELECT_BACKGROUND_PATH "assets/backgrounds/selection_background.png"
+#define FIGHT_ELETRICAL_PATH "assets/backgrounds/eletrical_background.png"
+#define FIGHT_MOON_MATH "assets/backgrounds/moon_background.png"
+
 #endif

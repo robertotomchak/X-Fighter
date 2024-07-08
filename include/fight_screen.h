@@ -8,7 +8,7 @@
 
 #include "auxiliary.h"
 #include "player.h"
-#include "screen_status_defines.h"
+#include "screen_defines.h"
 #include "variable_bar.h"
 
 // health bar defines (all are %)

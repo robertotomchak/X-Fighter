@@ -8,7 +8,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #include "auxiliary.h"
-#include "screen_status_defines.h"
+#include "screen_defines.h"
 
 #define N_CHOICES 4
 

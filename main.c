@@ -15,33 +15,8 @@
 #define SCREEN_HEIGHT 800
 #define GRAVITY 1
 
-#define PLAYER_WIDTH 200
-#define PLAYER_HEIGHT 300
-#define SPEED_X 10
-#define JUMP_SPEED 25
-
-#define OFFSET_SUP 64
-#define SIZE_X_SUP 120
-#define SIZE_Y_SUP 15
-#define DMG_SUP 200 
-
-#define OFFSET_INF 0
-#define SIZE_X_INF 35
-#define SIZE_Y_INF 55
-#define DMG_INF 25
-#define STAMINA_SPEED 5
-
-#define RED_PLAYER 0
-#define YELLOW_PLAYER 1
-#define BLUE_PLAYER 2
-#define GREEN_PLAYER 3
-
-#define RED_SPRITE_PATH "assets/sprites/red_sprite.png"
-#define YELLOW_SPRITE_PATH "assets/sprites/yellow_sprite.png"
-#define BLUE_SPRITE_PATH "assets/sprites/blue_sprite.png"
-#define GREEN_SPRITE_PATH "assets/sprites/green_sprite.png"
-
 // game loop for start screen
+// simple enough that doesn't require a special library for it
 // returns status (quit or started)
 short start_screen(ALLEGRO_EVENT_QUEUE *queue)
 {
