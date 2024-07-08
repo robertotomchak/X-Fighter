@@ -23,7 +23,7 @@
 #define OFFSET_SUP 64
 #define SIZE_X_SUP 120
 #define SIZE_Y_SUP 15
-#define DMG_SUP 200  // damage per frame
+#define DMG_SUP 200 
 
 #define OFFSET_INF 0
 #define SIZE_X_INF 35
@@ -36,10 +36,10 @@
 #define BLUE_PLAYER 2
 #define GREEN_PLAYER 3
 
-#define RED_SPRITE_PATH "assets/red_sprite.png"
-#define YELLOW_SPRITE_PATH "assets/yellow_sprite.png"
-#define BLUE_SPRITE_PATH "assets/blue_sprite.png"
-#define GREEN_SPRITE_PATH "assets/green_sprite.png"
+#define RED_SPRITE_PATH "assets/sprites/red_sprite.png"
+#define YELLOW_SPRITE_PATH "assets/sprites/yellow_sprite.png"
+#define BLUE_SPRITE_PATH "assets/sprites/blue_sprite.png"
+#define GREEN_SPRITE_PATH "assets/sprites/green_sprite.png"
 
 // game loop for start screen
 // returns status (quit or started)
