@@ -1,36 +1,10 @@
 /* screen where players select their players*/
 
+#include "stdio.h"
 #include "select_screen.h"
 
-/*
-#define N_CHOICES 4
-#define STAY 0
-#define QUIT 1
-#define SELECTED 2
-
-// joystick to select players
-struct joystick {
-    short up;
-    short left;
-    short down;
-    short right;
-    short confirm;  // confirm/change your choice
-};
-typedef struct joystick Joystick;
-
-struct select_screen {
-    Pair size;
-    short n_choices;  // how many choices (defined by constant)
-    Joystick select_p1;
-    Joystick select_p2;
-    Pair confirmed;  // if players have confirmed their choice
-    Pair selected_choices;  // choices of p1 and p2
-};
-typedef struct select_screen Select_Screen;
-*/
-
 // creates the screen object
-Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2)
+Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2, short start_key)
 {
     Select_Screen *screen = malloc(sizeof(Select_Screen));
     if (!screen)
@@ -50,6 +24,14 @@ Select_Screen *create_select_screen(int width, int height, short up1, short left
     screen->select_p2.left = left2;
     screen->select_p2.right = right2;
     screen->select_p2.confirm = confirm2;
+
+    screen->start_key = start_key;
+
+    // player's heads
+    screen->heads[RED_PLAYER] = al_load_bitmap(RED_HEAD_PATH);
+    screen->heads[YELLOW_PLAYER] = al_load_bitmap(YELLOW_HEAD_PATH);
+    screen->heads[BLUE_PLAYER] = al_load_bitmap(BLUE_HEAD_PATH);
+    screen->heads[GREEN_PLAYER] = al_load_bitmap(GREEN_HEAD_PATH);
 
     // by default, choice 0 is choosen and not confirmed
     screen->selected_choices.x = 0;
@@ -83,8 +65,8 @@ int update_select_screen(Select_Screen *screen, unsigned int event, unsigned int
     // if event is quit, return QUIT
     if (event == ALLEGRO_EVENT_DISPLAY_CLOSE)
         return QUIT;
-     // if both have confirmed, return SELECTED
-    if (screen->confirmed.x && screen->confirmed.y)
+     // if both have confirmed and start key pressed, return SELECTED
+    if (screen->confirmed.x && screen->confirmed.y && event == ALLEGRO_EVENT_KEY_DOWN && key == screen->start_key)
         return SELECTED;
     if (event != ALLEGRO_EVENT_KEY_DOWN)
         return STAY;
@@ -110,7 +92,7 @@ void draw_select_screen(Select_Screen *screen)
     long margin = (size_big_square - 2 * size_small_square) / 3;
 
     // big square coordinates
-    long x1 = (screen->size.x - size_big_square) / 2, y1 = (screen->size.y - size_big_square) / 2;
+    long x1 = (screen->size.x - size_big_square) / 2, y1 = screen->size.y * SQUARE_MARGIN_Y / 100;
     long x2 = x1 + size_big_square, y2 = y1 + size_big_square;
 
     // colors of squares, based on players choices
@@ -150,6 +132,24 @@ void draw_select_screen(Select_Screen *screen)
                 break;
         }
     }
+
+    // draw player's heads
+    al_draw_scaled_bitmap(screen->heads[0], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, x1+margin, y1+margin, size_small_square, size_small_square, 0);
+    al_draw_scaled_bitmap(screen->heads[1], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, x2-margin-size_small_square, y1+margin, size_small_square, size_small_square, 0);
+    al_draw_scaled_bitmap(screen->heads[2], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, x1+margin, y2-margin-size_small_square, size_small_square, size_small_square, 0);
+    al_draw_scaled_bitmap(screen->heads[3], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, x2-margin-size_small_square, y2-margin-size_small_square, size_small_square, size_small_square, 0);
+
+    // draw selected players (if any)
+    long choice_size = CHOICE_SIZE_FACTOR * size_small_square / 100;
+    long choice_x = CHOICE_MARGIN_X * screen->size.x / 100;
+    long choice_y = CHOICE_MARGIN_Y * screen->size.y / 100;
+    if (screen->confirmed.x) {
+        al_draw_scaled_bitmap(screen->heads[screen->selected_choices.x], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, choice_x, choice_y, choice_size, choice_size, 0);
+    }
+    if (screen->confirmed.y) {
+        al_draw_scaled_bitmap(screen->heads[screen->selected_choices.y], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, screen->size.x - choice_x - choice_size, choice_y, choice_size, choice_size, 0);
+    }
+
     al_flip_display();
 }
 

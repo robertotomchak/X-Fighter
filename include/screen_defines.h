@@ -16,6 +16,12 @@
 #define FIGHT_ELETRICAL_PATH "assets/backgrounds/eletrical_background.png"
 #define FIGHT_MOON_MATH "assets/backgrounds/moon_background.png"
 
+// player's heads (for select screen)
+#define RED_HEAD_PATH "assets/heads/red_head.png"
+#define YELLOW_HEAD_PATH "assets/heads/yellow_head.png"
+#define BLUE_HEAD_PATH "assets/heads/blue_head.png"
+#define GREEN_HEAD_PATH "assets/heads/green_head.png"
+
 // image dimensions
 #define START_IMG_WIDTH 1300
 #define START_IMG_HEIGHT 800

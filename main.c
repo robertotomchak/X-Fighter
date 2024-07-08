@@ -46,7 +46,7 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices)
 {
     ALLEGRO_EVENT event;
     Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
-                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_ENTER);
+                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_RSHIFT, ALLEGRO_KEY_ENTER);
     short status = STAY;
     while (status == STAY) {
         al_wait_for_event(queue, &event);
