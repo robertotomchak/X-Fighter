@@ -35,11 +35,13 @@ struct fight_screen {
     Var_Bar *p2_hp;
     Var_Bar *p1_sta;  // sta = stamina_bar
     Var_Bar *p2_sta;
+    ALLEGRO_BITMAP *background;
+    Pair source_img_size;
 };
 typedef struct fight_screen Fight_Screen;
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, int gravity);
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario);
 
 // updates screen based on given event
 // returns type of exit, based on defines

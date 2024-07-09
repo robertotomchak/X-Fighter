@@ -4,6 +4,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_ttf.h>
 
 #include "player.h"
 #include "fight_screen.h"
@@ -42,11 +43,11 @@ short start_screen(ALLEGRO_EVENT_QUEUE *queue)
 
 // game loop for select screen
 // returns status (quit or selected); puts selected choices in <choices>
-short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices)
+short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices, short *scenario)
 {
     ALLEGRO_EVENT event;
     Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
-                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_RSHIFT, ALLEGRO_KEY_ENTER);
+                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_RSHIFT, ALLEGRO_KEY_ENTER, ALLEGRO_KEY_SPACE);
     short status = STAY;
     while (status == STAY) {
         al_wait_for_event(queue, &event);
@@ -54,14 +55,14 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices)
             draw_select_screen(sscreen);
         status = update_select_screen(sscreen, event.type, event.keyboard.keycode);
     }
-    get_choices(sscreen, choices);
+    get_choices(sscreen, choices, scenario);
     destroy_select_screen(sscreen);
     return status;
 }
 
 // game loop for select screen
 // returns status (quit or victory); puts winner (0 or 1) in <p1_won>
-short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, bool *p1_won)
+short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short scenario, bool *p1_won)
 {
     ALLEGRO_EVENT event;
     short status = STAY;
@@ -113,7 +114,7 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, bool *p
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, sprite2, false, STAMINA_SPEED); 
-    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, GRAVITY);
+    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario);
 
 
     while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
@@ -141,6 +142,8 @@ int main ()
     al_init_primitives_addon();
     al_install_keyboard();
     al_init_image_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
 
     ALLEGRO_TIMER *timer = al_create_timer(1.0 / FPS);
     ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
@@ -155,6 +158,7 @@ int main ()
     // auxiliary variables
     short status;
     Pair choices;
+    short scenario;
     bool p1_won;
 
     // game loop
@@ -163,13 +167,13 @@ int main ()
         printf("Quitting game\n");
         return 0;
     }
-    status = select_loop(queue, &choices);
+    status = select_loop(queue, &choices, &scenario);
     if (status == QUIT) {
         printf("Quitting game\n");
         return 0;
     }
     printf("Players Selected: %d %d\n", choices.x, choices.y);
-    status = fight_loop(queue, choices.x, choices.y, &p1_won);
+    status = fight_loop(queue, choices.x, choices.y, scenario, &p1_won);
     if (status == QUIT) {
         printf("Quitting game\n");
         return 0;

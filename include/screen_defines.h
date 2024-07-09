@@ -13,8 +13,8 @@
 // image backgrounds
 #define START_BACKGROUND_PATH "assets/backgrounds/start_background.png"
 #define SELECT_BACKGROUND_PATH "assets/backgrounds/selection_background.png"
-#define FIGHT_ELETRICAL_PATH "assets/backgrounds/eletrical_background.png"
-#define FIGHT_MOON_MATH "assets/backgrounds/moon_background.png"
+#define SCENARIO_ELETRICAL_PATH "assets/backgrounds/eletrical_background.png"
+#define SCENARIO_MOON_PATH "assets/backgrounds/moon_background.png"
 
 // player's heads (for select screen)
 #define RED_HEAD_PATH "assets/heads/red_head.png"
@@ -25,5 +25,22 @@
 // image dimensions
 #define START_IMG_WIDTH 1300
 #define START_IMG_HEIGHT 800
+#define SELECT_IMG_WIDTH 2560
+#define SELECT_IMG_HEIGHT 1440
+#define ELETRICAL_IMG_WIDTH 725
+#define ELETRICAL_IMG_HEIGHT 416
+#define MOON_IMG_WIDTH 626
+#define MOON_IMG_HEIGHT 348
+
+// scenarios
+#define ELETRICAL_SCENARIO 0
+#define MOON_SCENARIO 1
+
+// font
+#define FONT_PATH "assets/fonts/in_your_face_joffrey.ttf" 
+
+// gravity
+#define GRAVITY_ELETRICAL 2
+#define GRAVITY_MOON 1
 
 #endif

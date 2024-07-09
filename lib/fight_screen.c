@@ -4,7 +4,7 @@
 
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, int gravity)
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario)
 {
     Fight_Screen *screen = malloc(sizeof(Fight_Screen));
     if (!screen)
@@ -18,7 +18,6 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
     screen->p1 = p1;
     screen->p2 = p2;
     screen->player_x_offset = player_x_offset;
-    screen->gravity = gravity;
 
     reset_player(p1, player_x_offset, height);
     reset_player(p2, width - p2->size.x - player_x_offset, height);
@@ -28,6 +27,19 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
 
     screen->p1_sta = create_stamina_bar(STA_BAR_MARGIN_X * width / 100, STA_BAR_MARGIN_Y * height / 100, STA_BAR_SIZE_X * width / 100, STA_BAR_SIZE_Y * height / 100, false, MAX_STAMINA);
     screen->p2_sta = create_stamina_bar(width - STA_BAR_MARGIN_X * width / 100, STA_BAR_MARGIN_Y * height / 100, STA_BAR_SIZE_X * width / 100, STA_BAR_SIZE_Y * height / 100, true, MAX_STAMINA);
+    
+    if (scenario == ELETRICAL_SCENARIO) {
+        screen->background = al_load_bitmap(SCENARIO_ELETRICAL_PATH);
+        screen->gravity = GRAVITY_ELETRICAL;
+        screen->source_img_size.x = ELETRICAL_IMG_WIDTH;
+        screen->source_img_size.y = ELETRICAL_IMG_HEIGHT;
+    }
+    else {
+        screen->background = al_load_bitmap(SCENARIO_MOON_PATH);
+        screen->gravity = GRAVITY_MOON;
+        screen->source_img_size.x = MOON_IMG_WIDTH;
+        screen->source_img_size.y = MOON_IMG_HEIGHT;
+    }
     return screen;
 }
 
@@ -74,6 +86,7 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
 void draw_fight_screen(Fight_Screen *screen)
 {
     al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_draw_scaled_bitmap(screen->background, 0, 0, screen->source_img_size.x, screen->source_img_size.y, 0, 0, screen->size.x, screen->size.y, 0);
     draw_player(screen->p1);
     draw_player(screen->p2);
     draw_var_bar(screen->p1_hp);
@@ -104,5 +117,6 @@ void destroy_fight_screen(Fight_Screen *screen)
     kill_player(screen->p2);
 	destroy_var_bar(screen->p1_hp);
 	destroy_var_bar(screen->p2_hp);
+    al_destroy_bitmap(screen->background); screen->background = NULL;
     free(screen); screen = NULL;
 }
