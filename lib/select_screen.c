@@ -156,6 +156,9 @@ void draw_select_screen(Select_Screen *screen)
 // destroys screen and frees its memory
 void destroy_select_screen(Select_Screen *screen)
 {
+    for (int i = 0; i < N_CHOICES; i++) {
+        al_destroy_bitmap(screen->heads[i]); screen->heads[i] = NULL;
+    }
     free(screen); screen = NULL;
 }
 
