@@ -45,6 +45,8 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
     screen->paused = false;
     screen->pause_key = pause_key;
 
+    screen->points = al_load_bitmap(BABY_PATH);
+
     return screen;
 }
 
@@ -103,6 +105,20 @@ void draw_fight_screen(Fight_Screen *screen)
     draw_var_bar(screen->p2_hp);
     draw_var_bar(screen->p1_sta);
     draw_var_bar(screen->p2_sta);
+    // draws points of player 1
+    int i = 0;
+    long points_x = screen->size.x * HP_BAR_MARGIN_X / 100, points_y = screen->size.y * POINTS_MARGIN_Y / 100, points_size = screen->size.y * POINTS_SIZE / 100;
+    for (i = 0; i < screen->score.x; i++) {
+        al_draw_scaled_bitmap(screen->points, 0, 0, BABY_IMG_WIDTH, BABY_IMG_HEIGHT, points_x, points_y, points_size, points_size, 0);
+        points_x += points_size;
+    }
+    // draws points of player 2
+    points_x  = screen->size.x - screen->size.x * HP_BAR_MARGIN_X / 100 - points_size;
+    for (i = 0; i < screen->score.y; i++) {
+        al_draw_scaled_bitmap(screen->points, 0, 0, BABY_IMG_WIDTH, BABY_IMG_HEIGHT, points_x, points_y, points_size, points_size, 0);
+        points_x -= points_size;
+    }
+
     if (screen->paused)
         al_draw_text(screen->font, al_map_rgb(255, 255, 255), screen->size.x / 2, FONT_PAUSED_MARGIN_Y * screen->size.y / 100, ALLEGRO_ALIGN_CENTRE, "GAME PAUSED");
     al_flip_display();
@@ -130,6 +146,7 @@ void destroy_fight_screen(Fight_Screen *screen)
 	destroy_var_bar(screen->p1_hp);
 	destroy_var_bar(screen->p2_hp);
     al_destroy_bitmap(screen->background); screen->background = NULL;
+    al_destroy_bitmap(screen->points); screen->points = NULL;
     al_destroy_font(screen->font); screen->font = NULL;
     free(screen); screen = NULL;
 }

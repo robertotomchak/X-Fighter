@@ -29,6 +29,10 @@
 #define FONT_SIZE_PAUSED 100
 #define FONT_PAUSED_MARGIN_Y 45
 
+// points defines
+#define POINTS_SIZE 5
+#define POINTS_MARGIN_Y 25
+
 struct fight_screen {
     Pair size;
     short n_rounds;  // how many rounds will be played
@@ -46,6 +50,7 @@ struct fight_screen {
     ALLEGRO_FONT *font;
     short pause_key;
     bool paused;
+    ALLEGRO_BITMAP *points;
 };
 typedef struct fight_screen Fight_Screen;
 
