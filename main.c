@@ -61,8 +61,8 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices, short *scenario)
 }
 
 // game loop for select screen
-// returns status (quit or victory); puts winner (0 or 1) in <p1_won>
-short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short scenario, bool *p1_won)
+// returns status (quit or victory); puts winner (0 or 1) in <p1_won> and its sprite id in <winner>
+short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short scenario, bool *p1_won, short *winner)
 {
     ALLEGRO_EVENT event;
     short status = STAY;
@@ -127,11 +127,76 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short s
         else if (status == VICTORY_P2)
             printf("Player 2 won match!\n");
     }
-    if (game_over(fscreen) == -1)
+    if (game_over(fscreen) == -1) {
         *p1_won = true;
-    else
+        *winner = p1_index;
+    }
+    else {
         *p1_won = false;
+        *winner = p2_index;
+    }
     destroy_fight_screen(fscreen);
+    return status;
+}
+
+// game loop for victory screen
+// returns status (quit or restart)
+short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, short scenario)
+{
+    ALLEGRO_EVENT event;
+    short status = STAY;
+    ALLEGRO_BITMAP *background, *player;
+    long img_width, img_height;
+    if (scenario == ELETRICAL_SCENARIO) {
+        background = al_load_bitmap(SCENARIO_ELETRICAL_PATH);
+        img_width = ELETRICAL_IMG_WIDTH;
+        img_height = ELETRICAL_IMG_HEIGHT;
+    }
+    else {
+        background = al_load_bitmap(SCENARIO_MOON_PATH);
+        img_width = MOON_IMG_WIDTH;
+        img_height = MOON_IMG_HEIGHT;
+    }
+
+    long player_height = CORRECTION_RATIO * PLAYER_HEIGHT;
+    long player_width = player_height * SPRITE_WIDTH / SPRITE_HEIGHT;
+    switch (winner) {
+        case RED_PLAYER:
+            player = al_load_bitmap(RED_SPRITE_PATH);
+            break;
+        case YELLOW_PLAYER:
+            player = al_load_bitmap(YELLOW_SPRITE_PATH);
+            break;
+        case BLUE_PLAYER:
+            player = al_load_bitmap(BLUE_SPRITE_PATH);
+            break;
+        case GREEN_PLAYER:
+            player = al_load_bitmap(GREEN_SPRITE_PATH);
+            break;
+        default:
+            printf("ERROR: NON VALID WINNER PLAYER\n");
+            break;
+    }
+
+    while (status == STAY) {
+        al_wait_for_event(queue, &event);
+        if (event.type == ALLEGRO_EVENT_TIMER) {
+            al_draw_scaled_bitmap(background, 0, 0, img_width, img_height, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+            al_draw_scaled_bitmap(player, 0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, (SCREEN_WIDTH - player_width) / 2, SCREEN_HEIGHT - player_height, player_width, player_height, 0);
+            al_flip_display();
+        }
+        else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            status = QUIT;
+        else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                status = QUIT;
+            else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+                status = START;
+        }
+    }
+    al_destroy_bitmap(background);
+    al_destroy_bitmap(player);
+
     return status;
 }
 
@@ -158,7 +223,7 @@ int main ()
     // auxiliary variables
     short status;
     Pair choices;
-    short scenario;
+    short scenario, winner;
     bool p1_won;
 
     // game loop
@@ -173,7 +238,7 @@ int main ()
         return 0;
     }
     printf("Players Selected: %d %d\n", choices.x, choices.y);
-    status = fight_loop(queue, choices.x, choices.y, scenario, &p1_won);
+    status = fight_loop(queue, choices.x, choices.y, scenario, &p1_won, &winner);
     if (status == QUIT) {
         printf("Quitting game\n");
         return 0;
@@ -183,7 +248,8 @@ int main ()
     }
     else {
         printf("Player 2 won the game!\n");
-    }
+    } 
+    victory_loop(queue, 2 - p1_won, winner, scenario);
 
     al_destroy_display(disp);
     al_destroy_timer(timer);

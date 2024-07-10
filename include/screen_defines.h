@@ -17,10 +17,13 @@
 #define SCENARIO_MOON_PATH "assets/backgrounds/moon_background.png"
 
 // player's heads (for select screen)
-#define RED_HEAD_PATH "assets/heads/red_head.png"
-#define YELLOW_HEAD_PATH "assets/heads/yellow_head.png"
-#define BLUE_HEAD_PATH "assets/heads/blue_head.png"
-#define GREEN_HEAD_PATH "assets/heads/green_head.png"
+#define RED_HEAD_PATH "assets/images/red_head.png"
+#define YELLOW_HEAD_PATH "assets/images/yellow_head.png"
+#define BLUE_HEAD_PATH "assets/images/blue_head.png"
+#define GREEN_HEAD_PATH "assets/images/green_head.png"
+
+// baby crewmate (for points)
+#define BABY_PATH "assets/images/baby.png"
 
 // image dimensions
 #define START_IMG_WIDTH 1300
@@ -31,6 +34,8 @@
 #define ELETRICAL_IMG_HEIGHT 416
 #define MOON_IMG_WIDTH 626
 #define MOON_IMG_HEIGHT 348
+#define BABY_IMG_WIDTH 481
+#define BABY_IMG_HEIGHT 517
 
 // scenarios
 #define ELETRICAL_SCENARIO 0
