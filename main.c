@@ -14,7 +14,9 @@
 #define FPS 30
 #define SCREEN_WIDTH 1300
 #define SCREEN_HEIGHT 800
-#define GRAVITY 1
+
+#define FONT_VICTORY_SIZE 80
+#define FONT_VICTORY_MARGIN_Y 40
 
 // game loop for start screen
 // simple enough that doesn't require a special library for it
@@ -147,6 +149,9 @@ short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, sh
     short status = STAY;
     ALLEGRO_BITMAP *background, *player;
     long img_width, img_height;
+    int img_flag = winner_id == 1? 0: ALLEGRO_FLIP_HORIZONTAL;
+    ALLEGRO_FONT *font = al_load_font(FONT_PATH, FONT_VICTORY_SIZE, 0);
+    char *victory_text = winner_id == 1? "Player 1 wins!" : "Player 2 wins!";
     if (scenario == ELETRICAL_SCENARIO) {
         background = al_load_bitmap(SCENARIO_ELETRICAL_PATH);
         img_width = ELETRICAL_IMG_WIDTH;
@@ -182,7 +187,8 @@ short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, sh
         al_wait_for_event(queue, &event);
         if (event.type == ALLEGRO_EVENT_TIMER) {
             al_draw_scaled_bitmap(background, 0, 0, img_width, img_height, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-            al_draw_scaled_bitmap(player, 0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, (SCREEN_WIDTH - player_width) / 2, SCREEN_HEIGHT - player_height, player_width, player_height, 0);
+            al_draw_scaled_bitmap(player, 0, 0, SPRITE_WIDTH, SPRITE_HEIGHT, (SCREEN_WIDTH - player_width) / 2, SCREEN_HEIGHT - player_height, player_width, player_height, img_flag);
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_WIDTH / 2, SCREEN_HEIGHT * FONT_VICTORY_MARGIN_Y / 100, ALLEGRO_ALIGN_CENTRE, victory_text);
             al_flip_display();
         }
         else if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
@@ -191,11 +197,12 @@ short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, sh
             if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                 status = QUIT;
             else if (event.keyboard.keycode == ALLEGRO_KEY_ENTER)
-                status = START;
+                status = BEGIN;
         }
     }
-    al_destroy_bitmap(background);
-    al_destroy_bitmap(player);
+    al_destroy_font(font); font = NULL;
+    al_destroy_bitmap(background); background = NULL;
+    al_destroy_bitmap(player); player = NULL;
 
     return status;
 }
@@ -221,35 +228,30 @@ int main ()
     al_start_timer(timer);
 
     // auxiliary variables
-    short status;
+    short status = BEGIN;
     Pair choices;
     short scenario, winner;
     bool p1_won;
 
-    // game loop
-    status = start_screen(queue);
-    if (status == QUIT) {
-        printf("Quitting game\n");
-        return 0;
+    // main loop
+    while (status != QUIT) {
+        switch (status) {
+            case BEGIN:
+                status = start_screen(queue);
+                break;
+            case START:
+                status = select_loop(queue, &choices, &scenario);
+                break;
+            case SELECTED:
+                status = fight_loop(queue, choices.x, choices.y, scenario, &p1_won, &winner);
+                break;
+            case GAME_OVER:
+                status = victory_loop(queue, 2 - p1_won, winner, scenario);
+                break;
+            default:
+                break;
+        }
     }
-    status = select_loop(queue, &choices, &scenario);
-    if (status == QUIT) {
-        printf("Quitting game\n");
-        return 0;
-    }
-    printf("Players Selected: %d %d\n", choices.x, choices.y);
-    status = fight_loop(queue, choices.x, choices.y, scenario, &p1_won, &winner);
-    if (status == QUIT) {
-        printf("Quitting game\n");
-        return 0;
-    }
-    else if (p1_won) {
-        printf("Player 1 won the game!\n");
-    }
-    else {
-        printf("Player 2 won the game!\n");
-    } 
-    victory_loop(queue, 2 - p1_won, winner, scenario);
 
     al_destroy_display(disp);
     al_destroy_timer(timer);

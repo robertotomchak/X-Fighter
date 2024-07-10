@@ -9,6 +9,7 @@
 #define VICTORY_P1 3  // who won that round
 #define VICTORY_P2 4  // who won that round
 #define START 5       // when press start in start screen
+#define BEGIN 6        // when opens game or goes to start screen
 
 // image backgrounds
 #define START_BACKGROUND_PATH "assets/backgrounds/start_background.png"

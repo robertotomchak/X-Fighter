@@ -70,7 +70,7 @@
 #define OFFSET_SUP 64
 #define SIZE_X_SUP 120
 #define SIZE_Y_SUP 15
-#define DMG_SUP 1000
+#define DMG_SUP 200
 
 #define OFFSET_INF 0
 #define SIZE_X_INF 35
