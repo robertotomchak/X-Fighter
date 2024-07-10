@@ -11,6 +11,8 @@
 #include "screen_defines.h"
 #include "variable_bar.h"
 
+#include <allegro5/allegro_font.h>
+
 // health bar defines (all are %)
 #define HP_BAR_MARGIN_X 10
 #define HP_BAR_MARGIN_Y 10
@@ -22,6 +24,10 @@
 #define STA_BAR_MARGIN_Y 20
 #define STA_BAR_SIZE_X 25
 #define STA_BAR_SIZE_Y 3
+
+// font defines
+#define FONT_SIZE_PAUSED 100
+#define FONT_PAUSED_MARGIN_Y 45
 
 struct fight_screen {
     Pair size;
@@ -37,11 +43,14 @@ struct fight_screen {
     Var_Bar *p2_sta;
     ALLEGRO_BITMAP *background;
     Pair source_img_size;
+    ALLEGRO_FONT *font;
+    short pause_key;
+    bool paused;
 };
 typedef struct fight_screen Fight_Screen;
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario);
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key);
 
 // updates screen based on given event
 // returns type of exit, based on defines

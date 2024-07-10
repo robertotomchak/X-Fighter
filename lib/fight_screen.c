@@ -4,7 +4,7 @@
 
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario)
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key)
 {
     Fight_Screen *screen = malloc(sizeof(Fight_Screen));
     if (!screen)
@@ -40,6 +40,11 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
         screen->source_img_size.x = MOON_IMG_WIDTH;
         screen->source_img_size.y = MOON_IMG_HEIGHT;
     }
+
+    screen->font = al_load_font(FONT_PATH, FONT_SIZE_PAUSED, 0);
+    screen->paused = false;
+    screen->pause_key = pause_key;
+
     return screen;
 }
 
@@ -53,13 +58,18 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
     if (event == ALLEGRO_EVENT_DISPLAY_CLOSE)
         return QUIT;
 
+    if (event == ALLEGRO_EVENT_KEY_DOWN && key == screen->pause_key)
+        screen->paused = !screen->paused;
+
     set_pair(&min_screen, 0, 0);
-    update_player(screen->p1, min_screen, screen->size, event, key, screen->gravity, screen->p2);
-    update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1);
-    update_var_bar(screen->p1_hp, screen->p1->health);
-    update_var_bar(screen->p2_hp, screen->p2->health);
-    update_var_bar(screen->p1_sta, screen->p1->stamina);
-    update_var_bar(screen->p2_sta, screen->p2->stamina);
+    update_player(screen->p1, min_screen, screen->size, event, key, screen->gravity, screen->p2, screen->paused);
+    update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1, screen->paused);
+    if (!screen->paused) {
+        update_var_bar(screen->p1_hp, screen->p1->health);
+        update_var_bar(screen->p2_hp, screen->p2->health);
+        update_var_bar(screen->p1_sta, screen->p1->stamina);
+        update_var_bar(screen->p2_sta, screen->p2->stamina);
+    }
 
     score = round_over(screen->p1, screen->p2);
     if (score != 0) {
@@ -93,6 +103,8 @@ void draw_fight_screen(Fight_Screen *screen)
     draw_var_bar(screen->p2_hp);
     draw_var_bar(screen->p1_sta);
     draw_var_bar(screen->p2_sta);
+    if (screen->paused)
+        al_draw_text(screen->font, al_map_rgb(255, 255, 255), screen->size.x / 2, FONT_PAUSED_MARGIN_Y * screen->size.y / 100, ALLEGRO_ALIGN_CENTRE, "GAME PAUSED");
     al_flip_display();
 }
 
@@ -118,5 +130,6 @@ void destroy_fight_screen(Fight_Screen *screen)
 	destroy_var_bar(screen->p1_hp);
 	destroy_var_bar(screen->p2_hp);
     al_destroy_bitmap(screen->background); screen->background = NULL;
+    al_destroy_font(screen->font); screen->font = NULL;
     free(screen); screen = NULL;
 }

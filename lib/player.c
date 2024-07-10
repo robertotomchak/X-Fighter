@@ -232,7 +232,7 @@ void update_player_sprite(Player *p)
 // updates player based on event type and key 
 // min_screen and max_screen define screen limits
 // deals with collision with p_other
-void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other)
+void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other, bool paused)
 {
     int h, h_other;
     h = p->size.y;
@@ -247,22 +247,22 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
             p->joystick.left.active ^= 1;
         else if (key == p->joystick.right.keycode)
             p->joystick.right.active ^= 1;
-        else if (key == p->joystick.up.keycode && event == ALLEGRO_EVENT_KEY_DOWN)
+        else if (key == p->joystick.up.keycode && event == ALLEGRO_EVENT_KEY_DOWN && !paused)
             p->joystick.up.active = 1;
         else if (key == p->joystick.down.keycode)
             p->joystick.down.active ^= 1;
-        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING)
+        else if (key == p->joystick.hit_sup.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING && !paused)
             p->joystick.hit_sup.active = 1;
-        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING)
+        else if (key == p->joystick.hit_inf.keycode && event == ALLEGRO_EVENT_KEY_DOWN && p->state == STANDING && !paused)
             p->joystick.hit_inf.active = 1;
+    }
+
+    // if update screen, move player and update status if necessary
+    if (event != ALLEGRO_EVENT_TIMER || paused) {
+            return;
     }
     update_player_state(p, max_screen);
     update_player_sprite(p);
-
-    // if update screen, move player and update status if necessary
-    if (event != ALLEGRO_EVENT_TIMER) {
-            return;
-    }
 
     // update number of frames and stamina (only recover if in standing state)
     p->n_frames += 1;

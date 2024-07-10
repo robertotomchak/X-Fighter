@@ -114,7 +114,7 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short s
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, sprite2, false, STAMINA_SPEED); 
-    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario);
+    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario, ALLEGRO_KEY_ESCAPE);
 
 
     while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
