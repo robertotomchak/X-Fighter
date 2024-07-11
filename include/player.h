@@ -70,7 +70,7 @@ Player *create_player(short up, short left, short down, short right, short k_hit
 void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int event, unsigned int key, unsigned short gravity, Player *p_other, bool paused);
 
 // draws player
-void draw_player(Player *p);
+void draw_player(Player *p, bool show_hitboxes);
 
 // defines if match is over, and who won
 // return -1, 0 or 1:

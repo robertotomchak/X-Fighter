@@ -329,21 +329,23 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 }
 
 // draws player
-void draw_player(Player *p)
+void draw_player(Player *p, bool show_hitboxes)
 {
     int end_hit_x;
-    if (p->state == CROUCH)
-        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
-    else
-        al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
-    
-    if (p->state == PUNCH) {
-        end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
-        al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, al_map_rgb(255, 0, 0));
-    }
-    else if (p->state == KICK) {
-        end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
-        al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, al_map_rgb(255, 0, 0));
+    if (show_hitboxes) {
+        if (p->state == CROUCH)
+            al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
+        else
+            al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
+        
+        if (p->state == PUNCH) {
+            end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
+            al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, al_map_rgb(255, 0, 0));
+        }
+        else if (p->state == KICK) {
+            end_hit_x = p->face_right? p->hit_inf->coords.x + p->hit_inf->size.x: p->hit_inf->coords.x - p->hit_inf->size.x;
+            al_draw_filled_rectangle(p->hit_inf->coords.x, p->hit_inf->coords.y - p->hit_inf->size.y, end_hit_x, p->hit_inf->coords.y, al_map_rgb(255, 0, 0));
+        }
     }
     set_sprite_coords(p->img, p->coords.x + p->size.x / 2, p->coords.y);
     draw_sprite(p->img, !p->face_right);

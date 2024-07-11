@@ -8,6 +8,10 @@
     - States
 */
 
+#include "stdbool.h"
+
+#define SHOW_HITBOXES false
+
 // defines of sprites of this project
 #define SPRITE_WIDTH 200
 #define SPRITE_HEIGHT 120

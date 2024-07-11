@@ -99,8 +99,8 @@ void draw_fight_screen(Fight_Screen *screen)
 {
     al_clear_to_color(al_map_rgb(0, 0, 0));
     al_draw_scaled_bitmap(screen->background, 0, 0, screen->source_img_size.x, screen->source_img_size.y, 0, 0, screen->size.x, screen->size.y, 0);
-    draw_player(screen->p1);
-    draw_player(screen->p2);
+    draw_player(screen->p1, SHOW_HITBOXES);
+    draw_player(screen->p2, SHOW_HITBOXES);
     draw_var_bar(screen->p1_hp);
     draw_var_bar(screen->p2_hp);
     draw_var_bar(screen->p1_sta);
