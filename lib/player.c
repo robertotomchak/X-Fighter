@@ -372,6 +372,8 @@ void reset_player(Player *p, int x, int y)
     p->state = STANDING;
     p->sprite_status = NORMAL1_SPRITE;
     p->hit_dmg = false;
+    p->joystick.hit_sup.active = 0;
+    p->joystick.hit_inf.active = 0;
     p->face_right = true;
     p->speed.y = 0;  // starts on ground
     p->n_frames = 0;
