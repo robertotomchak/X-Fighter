@@ -10,6 +10,7 @@
 #include "player.h"
 #include "screen_defines.h"
 #include "variable_bar.h"
+#include "bot.h"
 
 #include <allegro5/allegro_font.h>
 
@@ -51,11 +52,12 @@ struct fight_screen {
     short pause_key;
     bool paused;
     ALLEGRO_BITMAP *points;
+    bool bot_player;  // if has bot player or not
 };
 typedef struct fight_screen Fight_Screen;
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key);
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key, bool bot_player);
 
 // updates screen based on given event
 // returns type of exit, based on defines

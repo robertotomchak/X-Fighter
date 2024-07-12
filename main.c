@@ -1,6 +1,8 @@
 // Compilação: gcc auxiliary.c player.c main.c -o main $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_primitives-5 --libs --cflags)
 
 #include <stdio.h>
+#include <time.h>
+
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
@@ -116,7 +118,7 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short s
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, sprite2, false, STAMINA_SPEED); 
-    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario, ALLEGRO_KEY_ESCAPE);
+    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario, ALLEGRO_KEY_ESCAPE, true);
 
 
     while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
@@ -209,6 +211,7 @@ short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, sh
 
 int main ()
 {
+    srand(time(NULL));
     // allegro initializations
     al_init();
     al_init_primitives_addon();
