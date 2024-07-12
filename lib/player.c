@@ -91,9 +91,9 @@ bool collision_y(Player *p1, Player *p2)
     h1 = p1->size.y;
     h2 = p2->size.y;
     if (p1->state == CROUCH)
-        h1 /=  2;
+        h1 = CROUCH_SIZE * h1 / 100;
     if (p2->state == CROUCH)
-        h2 /= 2;
+        h2 = CROUCH_SIZE * h2 / 100;
 
     return (p1->coords.y <= p2->coords.y && p1->coords.y > p2->coords.y - h2) || (p2->coords.y <= p1->coords.y && p2->coords.y > p1->coords.y - h1);
 }
@@ -106,7 +106,7 @@ bool player_hit(Player *p, Hit *hit, bool orientation) {
 
     h = p->size.y;
     if (p->state == CROUCH)
-        h /=  2;
+        h =  CROUCH_SIZE * h / 100;
 
     if (orientation) {
         x1 = hit->coords.x;
@@ -238,9 +238,9 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
     h = p->size.y;
     h_other = p_other->size.y;
     if (p->state == CROUCH)
-        h /= 2;
+        h = CROUCH_SIZE * h / 100;
     if (p_other->state == CROUCH)
-        h_other /= 2;
+        h_other = CROUCH_SIZE * h_other / 100;
     // if key pressed or release, update joystick
     if (event == ALLEGRO_EVENT_KEY_DOWN || event == ALLEGRO_EVENT_KEY_UP) {
         if (key == p->joystick.left.keycode)
@@ -332,12 +332,11 @@ void update_player(Player *p, Pair min_screen, Pair max_screen, unsigned int eve
 void draw_player(Player *p, bool show_hitboxes)
 {
     int end_hit_x;
+    long h = p->size.y;
+    if (p->state == CROUCH)
+        h = CROUCH_SIZE * h / 100;
     if (show_hitboxes) {
-        if (p->state == CROUCH)
-            al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y / 2, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
-        else
-            al_draw_filled_rectangle(p->coords.x, p->coords.y - p->size.y, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
-        
+        al_draw_filled_rectangle(p->coords.x, p->coords.y - h, p->coords.x + p->size.x, p->coords.y, al_map_rgb(255, 0, 0));
         if (p->state == PUNCH) {
             end_hit_x = p->face_right? p->hit_sup->coords.x + p->hit_sup->size.x: p->hit_sup->coords.x - p->hit_sup->size.x; 
             al_draw_filled_rectangle(p->hit_sup->coords.x, p->hit_sup->coords.y - p->hit_sup->size.y, end_hit_x, p->hit_sup->coords.y, al_map_rgb(255, 0, 0));

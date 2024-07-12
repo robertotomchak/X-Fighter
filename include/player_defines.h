@@ -17,6 +17,7 @@
 #define SPRITE_HEIGHT 120
 #define NUM_SPRITES 8
 #define CORRECTION_RATIO 1.25  // make sprite have the correct height
+#define CROUCH_SIZE 60  // % of normal size
 
 // number of each player
 #define RED_PLAYER 0
@@ -62,10 +63,11 @@
 #define MAX_STAMINA 1000
 
 // stamina costs
-#define CROUCH_STAMINA 20
+#define CROUCH_STAMINA 1
 #define JUMP_STAMINA 100
 #define PUNCH_STAMINA 200
 #define KICK_STAMINA 100
+#define STAMINA_SPEED 5
 
 // sizes and some factors
 #define PLAYER_WIDTH 200
@@ -82,6 +84,5 @@
 #define SIZE_X_INF 35
 #define SIZE_Y_INF 55
 #define DMG_INF 25
-#define STAMINA_SPEED 5
 
 #endif
