@@ -73,7 +73,7 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
         if (event == ALLEGRO_EVENT_TIMER)
             update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1, screen->paused);
         bot_play(screen->p2, screen->p1, &bot_event, &bot_key);
-        if (bot_event != ALLEGRO_EVENT_TIMER)
+        if (bot_event != -1)
             update_player(screen->p2, min_screen, screen->size, bot_event, bot_key, screen->gravity, screen->p1, screen->paused);
     }
     else

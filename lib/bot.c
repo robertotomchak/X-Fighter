@@ -63,7 +63,7 @@ void bot_play(Player *bot, Player *p_other, int *event_type, int *keycode)
 {
     // only makes plays in standing or crouch states
     if (bot->state != STANDING && bot->state != CROUCH) {
-        *event_type = ALLEGRO_EVENT_TIMER;
+        *event_type = -1;
         keycode = NULL;
         return;
     }
@@ -75,7 +75,7 @@ void bot_play(Player *bot, Player *p_other, int *event_type, int *keycode)
     }
     // if low in stamina, do nothing
     if (bot->stamina < MAX_STAMINA) {
-        *event_type = ALLEGRO_EVENT_TIMER;
+        *event_type = -1;
         keycode = NULL;
         return;
     }
@@ -88,7 +88,7 @@ void bot_play(Player *bot, Player *p_other, int *event_type, int *keycode)
     if (bot->face_right) {
         // already walking to correct direction
         if (bot->joystick.right.active && !bot->joystick.left.active) {
-            *event_type = ALLEGRO_EVENT_TIMER;
+            *event_type = -1;
             keycode = NULL;
         }
         // walking in wrong direction
@@ -105,7 +105,7 @@ void bot_play(Player *bot, Player *p_other, int *event_type, int *keycode)
     else {
         // already walking to correct direction
         if (bot->joystick.left.active && !bot->joystick.right.active) {
-            *event_type = ALLEGRO_EVENT_TIMER;
+            *event_type = -1;
             keycode = NULL;
         }
         // walking in wrong direction
