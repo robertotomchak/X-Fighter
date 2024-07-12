@@ -4,7 +4,7 @@
 
 
 // creates the screen object
-Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key)
+Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player *p1, Player *p2, int player_x_offset, short scenario, short pause_key, bool bot_player)
 {
     Fight_Screen *screen = malloc(sizeof(Fight_Screen));
     if (!screen)
@@ -47,6 +47,8 @@ Fight_Screen *create_fight_screen(int width, int height, short n_rounds, Player 
 
     screen->points = al_load_bitmap(BABY_PATH);
 
+    screen->bot_player = bot_player;
+
     return screen;
 }
 
@@ -56,6 +58,7 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
 {
     Pair min_screen;
     short score;
+    int bot_event, bot_key;
 
     if (event == ALLEGRO_EVENT_DISPLAY_CLOSE)
         return QUIT;
@@ -65,7 +68,16 @@ int update_fight_screen(Fight_Screen *screen, unsigned int event, unsigned int k
 
     set_pair(&min_screen, 0, 0);
     update_player(screen->p1, min_screen, screen->size, event, key, screen->gravity, screen->p2, screen->paused);
-    update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1, screen->paused);
+    
+    if (screen->bot_player) {
+        if (event == ALLEGRO_EVENT_TIMER)
+            update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1, screen->paused);
+        bot_play(screen->p2, screen->p1, &bot_event, &bot_key);
+        if (bot_event != ALLEGRO_EVENT_TIMER)
+            update_player(screen->p2, min_screen, screen->size, bot_event, bot_key, screen->gravity, screen->p1, screen->paused);
+    }
+    else
+        update_player(screen->p2, min_screen, screen->size, event, key, screen->gravity, screen->p1, screen->paused);
     if (!screen->paused) {
         update_var_bar(screen->p1_hp, screen->p1->health);
         update_var_bar(screen->p2_hp, screen->p2->health);
