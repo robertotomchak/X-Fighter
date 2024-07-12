@@ -23,12 +23,14 @@
 #define YELLOW_PLAYER 1
 #define BLUE_PLAYER 2
 #define GREEN_PLAYER 3
+#define BOT_PLAYER 4
 
 // path to sprite
 #define RED_SPRITE_PATH "assets/sprites/red_sprite.png"
 #define YELLOW_SPRITE_PATH "assets/sprites/yellow_sprite.png"
 #define BLUE_SPRITE_PATH "assets/sprites/blue_sprite.png"
 #define GREEN_SPRITE_PATH "assets/sprites/green_sprite.png"
+#define BOT_SPRITE_PATH "assets/sprites/bot_sprite.png"
 
 // name of each sprite
 #define NORMAL1_SPRITE 0

@@ -22,6 +22,7 @@
 #define YELLOW_HEAD_PATH "assets/images/yellow_head.png"
 #define BLUE_HEAD_PATH "assets/images/blue_head.png"
 #define GREEN_HEAD_PATH "assets/images/green_head.png"
+#define BOT_HEAD_PATH "assets/images/bot_head.png"
 
 // baby crewmate (for points)
 #define BABY_PATH "assets/images/baby.png"

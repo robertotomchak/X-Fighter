@@ -51,7 +51,7 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices, short *scenario)
 {
     ALLEGRO_EVENT event;
     Select_Screen *sscreen = create_select_screen(SCREEN_WIDTH, SCREEN_HEIGHT, ALLEGRO_KEY_W, ALLEGRO_KEY_A, ALLEGRO_KEY_S, ALLEGRO_KEY_D, ALLEGRO_KEY_LSHIFT,
-                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_RSHIFT, ALLEGRO_KEY_ENTER, ALLEGRO_KEY_SPACE);
+                        ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_RSHIFT, ALLEGRO_KEY_ENTER, ALLEGRO_KEY_SPACE, ALLEGRO_KEY_B);
     short status = STAY;
     while (status == STAY) {
         al_wait_for_event(queue, &event);
@@ -68,6 +68,7 @@ short select_loop(ALLEGRO_EVENT_QUEUE *queue, Pair *choices, short *scenario)
 // returns status (quit or victory); puts winner (0 or 1) in <p1_won> and its sprite id in <winner>
 short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short scenario, bool *p1_won, short *winner)
 {
+    printf("%d %d\n", p1_index, p2_index);
     ALLEGRO_EVENT event;
     short status = STAY;
     // creating players and screens
@@ -102,6 +103,9 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short s
         case GREEN_PLAYER:
             sprite2 = GREEN_SPRITE_PATH;
             break;
+        case BOT_PLAYER:
+            sprite2 = BOT_SPRITE_PATH;
+            break;
         default:
             printf("ERROR! NON VALID PLAYER\n");
             return 0;
@@ -118,7 +122,7 @@ short fight_loop(ALLEGRO_EVENT_QUEUE *queue, int p1_index, int p2_index, short s
     Player *p2 = create_player(ALLEGRO_KEY_UP, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_RIGHT, ALLEGRO_KEY_K, ALLEGRO_KEY_L, 
                         PLAYER_WIDTH, PLAYER_HEIGHT, SPEED_X, JUMP_SPEED, 
                         h_sup2, h_inf2, sprite2, false, STAMINA_SPEED); 
-    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario, ALLEGRO_KEY_ESCAPE, true);
+    Fight_Screen *fscreen = create_fight_screen(SCREEN_WIDTH, SCREEN_HEIGHT, 3, p1, p2, 50, scenario, ALLEGRO_KEY_ESCAPE, p2_index == BOT_PLAYER);
 
 
     while (status == STAY || status == VICTORY_P1 || status == VICTORY_P2) {
@@ -179,6 +183,9 @@ short victory_loop(ALLEGRO_EVENT_QUEUE *queue, short winner_id, short winner, sh
             break;
         case GREEN_PLAYER:
             player = al_load_bitmap(GREEN_SPRITE_PATH);
+            break;
+        case BOT_PLAYER:
+            player = al_load_bitmap(BOT_SPRITE_PATH);
             break;
         default:
             printf("ERROR: NON VALID WINNER PLAYER\n");

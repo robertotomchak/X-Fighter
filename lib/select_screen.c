@@ -4,7 +4,7 @@
 #include "select_screen.h"
 
 // creates the screen object
-Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2, short start_key, short scenario_key)
+Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2, short start_key, short scenario_key, short bot_key)
 {
     Select_Screen *screen = malloc(sizeof(Select_Screen));
     if (!screen)
@@ -27,12 +27,15 @@ Select_Screen *create_select_screen(int width, int height, short up1, short left
 
     screen->start_key = start_key;
     screen->scenario_key = scenario_key;
+    screen->bot_key = bot_key;
+    screen->bot_choice = false;
 
     // player's heads
     screen->heads[RED_PLAYER] = al_load_bitmap(RED_HEAD_PATH);
     screen->heads[YELLOW_PLAYER] = al_load_bitmap(YELLOW_HEAD_PATH);
     screen->heads[BLUE_PLAYER] = al_load_bitmap(BLUE_HEAD_PATH);
     screen->heads[GREEN_PLAYER] = al_load_bitmap(GREEN_HEAD_PATH);
+    screen->heads[BOT_PLAYER] = al_load_bitmap(BOT_HEAD_PATH);
     screen->background = al_load_bitmap(SELECT_BACKGROUND_PATH);
 
     // by default, choice 0 is choosen and not confirmed
@@ -75,7 +78,7 @@ int update_select_screen(Select_Screen *screen, unsigned int event, unsigned int
     if (event == ALLEGRO_EVENT_DISPLAY_CLOSE)
         return QUIT;
      // if both have confirmed and start key pressed, return SELECTED
-    if (screen->confirmed.x && screen->confirmed.y && event == ALLEGRO_EVENT_KEY_DOWN && key == screen->start_key)
+    if (screen->confirmed.x && (screen->confirmed.y || screen->bot_choice) && event == ALLEGRO_EVENT_KEY_DOWN && key == screen->start_key)
         return SELECTED;
     if (event != ALLEGRO_EVENT_KEY_DOWN)
         return STAY;
@@ -88,6 +91,9 @@ int update_select_screen(Select_Screen *screen, unsigned int event, unsigned int
     else if (key == screen->scenario_key)
         screen->scenario = (screen->scenario + 1) % N_SCENARIOS;
 
+    // if its bot key, update bot choice
+    if (key == screen->bot_key)
+        screen->bot_choice = !screen->bot_choice;
     if (!screen->confirmed.x)
         screen->selected_choices.x = update_player_choice(screen->select_p1, screen->selected_choices.x, key, screen->n_choices);
     if (!screen->confirmed.y)
@@ -155,11 +161,12 @@ void draw_select_screen(Select_Screen *screen)
     long choice_size = CHOICE_SIZE_FACTOR * size_small_square / 100;
     long choice_x = CHOICE_MARGIN_X * screen->size.x / 100;
     long choice_y = CHOICE_MARGIN_Y * screen->size.y / 100;
+    long p2_choice = screen->bot_choice? BOT_PLAYER: screen->selected_choices.y;
     if (screen->confirmed.x) {
         al_draw_scaled_bitmap(screen->heads[screen->selected_choices.x], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, choice_x, choice_y, choice_size, choice_size, 0);
     }
-    if (screen->confirmed.y) {
-        al_draw_scaled_bitmap(screen->heads[screen->selected_choices.y], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, screen->size.x - choice_x - choice_size, choice_y, choice_size, choice_size, 0);
+    if (screen->confirmed.y || screen->bot_choice) {
+        al_draw_scaled_bitmap(screen->heads[p2_choice], 0, 0, PLAYER_HEAD_SIZE, PLAYER_HEAD_SIZE, screen->size.x - choice_x - choice_size, choice_y, choice_size, choice_size, 0);
     }
 
     // draw background choice
@@ -200,6 +207,6 @@ void destroy_select_screen(Select_Screen *screen)
 void get_choices(Select_Screen *screen, Pair *choices, short *scenario)
 {
     choices->x = screen->selected_choices.x;
-    choices->y = screen->selected_choices.y;
+    choices->y = screen->bot_choice? BOT_PLAYER: screen->selected_choices.y;
     *scenario = screen->scenario;
 }

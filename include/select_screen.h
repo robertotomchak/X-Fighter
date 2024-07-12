@@ -51,16 +51,18 @@ struct select_screen {
     short scenario_key;  // switch between scenarios cgoices
     Pair confirmed;  // if players have confirmed their choice
     Pair selected_choices;  // choices of p1 and p2
-    ALLEGRO_BITMAP *heads[N_CHOICES];
+    ALLEGRO_BITMAP *heads[N_CHOICES+1];  // +1 because of bot
     ALLEGRO_BITMAP *background;
     ALLEGRO_BITMAP *scenario_choices[N_SCENARIOS];
     ALLEGRO_FONT *font;
     short scenario;
+    short bot_key;
+    bool bot_choice;
 };
 typedef struct select_screen Select_Screen;
 
 // creates the screen object
-Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2, short start_key, short scenario_key);
+Select_Screen *create_select_screen(int width, int height, short up1, short left1, short down1, short right1, short confirm1, short up2, short left2, short down2, short right2, short confirm2, short start_key, short scenario_key, short bot_key);
 
 // updates screen based on given event
 // returns type of exit, based on defines
