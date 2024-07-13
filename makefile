@@ -14,10 +14,10 @@ main: main.o libed | $(OBJ)
 
 libed: auxiliary.o fight_screen.o variable_bar.o player.o select_screen.o sprite.o bot.o
 
-main.o: main.c 
+main.o: main.c | $(OBJ)
 	$(CC) -c $(CFLAGS) $< -I $(INCLUDE) -o $(OBJ)/$@
 
-%.o: $(LIB)/%.c $(INCLUDE)/%.h
+%.o: $(LIB)/%.c $(INCLUDE)/%.h | $(OBJ)
 	$(CC) -c $(CFLAGS) $< -I $(INCLUDE) -o $(OBJ)/$@
 
 $(OBJ):
