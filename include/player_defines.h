@@ -10,7 +10,55 @@
 
 #include "stdbool.h"
 
-#define SHOW_HITBOXES false
+#define SHOW_HITBOXES true
+
+// speed related
+#define SPEED_X 10
+#define JUMP_SPEED 30
+
+// number of frames that stays in each sprite
+#define WALK_FRAMES 10
+#define PREP_FRAMES 35
+#define PUNCH_FRAMES 15
+#define KICK_FRAMES 15
+
+// stamina costs
+#define CROUCH_STAMINA 1  // per second
+#define JUMP_STAMINA 50
+#define PUNCH_STAMINA 100
+#define KICK_STAMINA 50
+#define STAMINA_SPEED 5
+
+// damage
+#define DMG_SUP 200
+#define DMG_INF 50
+
+// health/stamina
+#define MAX_HEALTH 1000
+#define MAX_STAMINA 1000
+
+
+// sizes
+#define PLAYER_WIDTH 225
+#define PLAYER_HEIGHT 300
+
+#define OFFSET_SUP 64
+#define SIZE_X_SUP 120
+#define SIZE_Y_SUP 15
+
+#define OFFSET_INF 0
+#define SIZE_X_INF 35
+#define SIZE_Y_INF 55
+
+
+
+// states
+#define STANDING 0
+#define CROUCH 1
+#define AIR 2
+#define PREP 3
+#define PUNCH 4
+#define KICK 5
 
 // defines of sprites of this project
 #define SPRITE_WIDTH 200
@@ -42,47 +90,6 @@
 #define PREP_SPRITE 5
 #define PUNCH_SPRITE 6
 #define CROUCH_SPRITE 7
-
-// number of frames that stays in sprite
-#define WALK_FRAMES 10
-#define PREP_FRAMES 30
-#define PUNCH_FRAMES 15
-#define KICK_FRAMES 15
 #define TOTAL_WALK_SPRITES 4
-
-// states
-#define STANDING 0
-#define CROUCH 1
-#define AIR 2
-#define PREP 3
-#define PUNCH 4
-#define KICK 5
-
-// health/stamina
-#define MAX_HEALTH 1000
-#define MAX_STAMINA 1000
-
-// stamina costs
-#define CROUCH_STAMINA 1
-#define JUMP_STAMINA 100
-#define PUNCH_STAMINA 200
-#define KICK_STAMINA 100
-#define STAMINA_SPEED 5
-
-// sizes and some factors
-#define PLAYER_WIDTH 200
-#define PLAYER_HEIGHT 300
-#define SPEED_X 10
-#define JUMP_SPEED 30
-
-#define OFFSET_SUP 64
-#define SIZE_X_SUP 120
-#define SIZE_Y_SUP 15
-#define DMG_SUP 200
-
-#define OFFSET_INF 0
-#define SIZE_X_INF 35
-#define SIZE_Y_INF 55
-#define DMG_INF 25
 
 #endif
