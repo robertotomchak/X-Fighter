@@ -1,5 +1,3 @@
-// Compilação: gcc auxiliary.c player.c main.c -o main $(pkg-config allegro-5 allegro_main-5 allegro_font-5 allegro_primitives-5 --libs --cflags)
-
 #include <stdio.h>
 #include <time.h>
 

@@ -1,16 +1,6 @@
 
 #include "bot.h"
 
-/*
-    Defines the Bot plays for the game
-    OBS: MUST SET SEED FOR RANDOM PLAYS
-    Bot's Strategies:
-        - If far away from other player, move to it
-        - If crounching with less than 50% stamina or far away from other player, stop crouching
-        - If in range of kick, make a random move (punch, kick, crouch or jump)
-        - If in air or attack state, do nothing
-*/
-
 // returns a random value between 0 and 100 (inclusive)
 int random_prob()
 {
