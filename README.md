@@ -4,6 +4,8 @@ This is a Street Fighter inspired game, with the theme of Among Us. The players 
 
 The fight happens in a best of 3, meaning the first player to win 2 rounds wins the game!
 
+The game was made in the C language, using the ALLEGRO Library: https://www.allegro.cc/manual/5/
+
 ## Keyboard Keys
 ### Start Screen
 - Start: ENTER
