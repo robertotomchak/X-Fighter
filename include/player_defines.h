@@ -10,7 +10,7 @@
 
 #include "stdbool.h"
 
-#define SHOW_HITBOXES true
+#define SHOW_HITBOXES false
 
 // speed related
 #define SPEED_X 10
